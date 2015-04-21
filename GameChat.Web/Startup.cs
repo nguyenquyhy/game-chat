@@ -16,6 +16,7 @@ using GameChat.Web.Models;
 using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using GameChat.Web.Logics;
 
 namespace GameChat.Web
 {
@@ -63,6 +64,7 @@ namespace GameChat.Web
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
 
+            services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
         }
 
         // Configure is called after ConfigureServices is called.

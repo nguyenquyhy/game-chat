@@ -13,3 +13,4 @@
 /// <reference path="lib/underscore/underscore.js" />
 /// <reference path="js/appviewmodel.js" />
 /// <reference path="js/models.js" />
+/// <reference path="../scripts/models.js" />

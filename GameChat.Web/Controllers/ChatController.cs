@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
+using GameChat.Web.Logics;
+using System.Threading.Tasks;
+using GameChat.Web.Models;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,35 +13,23 @@ namespace GameChat.Web.Controllers.Controllers
     [Route("api/[controller]")]
     public class ChatController : Controller
     {
+        private IStorageLogic storageLogic;
+
+        public ChatController(IStorageLogic storageLogic)
+        {
+            this.storageLogic = storageLogic;
+        }
+
         // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpGet("{source}")]
+        public Task<IEnumerable<ChatMessageModel>> Get(string source)
         {
-            return new string[] { "value1", "value2" };
+            return storageLogic.GetMessage(source);
         }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
+        
         // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPost("{source}")]
+        public async Task Post(string source, ChatMessageModel message)
         {
         }
     }

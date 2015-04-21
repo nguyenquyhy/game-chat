@@ -4,8 +4,8 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <form data-bind="visible: !isReady(), disable: isLoading" class="form-horizontal">
-            <input data-bind="text: password" type="password" class="form-control" placeholder="password" />
+        <form data-bind="visible: !isReady(), disable: isLoading" class="form-inline">
+            <input data-bind="value: password" type="password" class="form-control" placeholder="password" />
             <button data-bind="click: start" class="btn btn-success">Start</button>
         </form>
         <select data-bind="
@@ -25,7 +25,10 @@
 </div>
 <div data-bind="visible: isChatReady" class="row">
     <div class="col-lg-12">
-        <input type="text" class="form-control" />
+        <form class="form-inline">
+            <input data-bind="value: newMessage" type="text" class="form-control" />
+            <button data-bind="click: send" type="button" class="btn btn-info">Send</button>
+        </form>
     </div>
 </div>
 

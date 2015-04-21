@@ -12,6 +12,9 @@
     isChatReady: KnockoutObservable<boolean>;
     chatMessages: KnockoutObservableArray<IChatMessage>;
 
+    isChatSending: KnockoutObservable<boolean>;
+    newMessage: KnockoutObservable<string>;
+
     constructor() {
         this.password = ko.observable(null);
         this.sources = ko.observableArray([]);
@@ -34,6 +37,9 @@
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
         this.chatMessages = ko.observableArray([]);
+
+        this.isChatSending = ko.observable(false);
+        this.newMessage = ko.observable(null);
     }
 
     start() {
@@ -45,6 +51,8 @@
 
     getSource() {
         $.ajax('api/Sources', {
+            method: 'GET',
+            dataType: 'JSON',
             success: (data: ISourceModel[], status, xhr) => {
                 this.sources.removeAll();
                 $.each(data,(index, item) => this.sources.push(item));
@@ -63,14 +71,62 @@
 
     sourceSelected() {
         if (this.source !== null) {
-            var sourceKey = this.source.key;
-
-            this.isChatLoading(true);
-
-            this.isChatReady(true);
+            this.getChatMessages(this.source.key);
         }
         else {
             this.isChatReady(false);
         }
+    }
+
+    send() {
+        var newChat = {
+            timestamp: new Date(),
+            sender: 'Test',
+            message: this.newMessage(),
+            isMine: true
+        };
+        this.postChatMessage(this.source.key, newChat);
+    }
+
+    getChatMessages(sourceKey: string) {
+        this.isChatLoading(true);
+        this.isChatReady(false);
+        $.ajax('api/Chat/' + sourceKey, {
+            method: 'GET',
+            dataType: 'JSON',
+            success: (data: IChatMessage[], status, xhr) => {
+                this.chatMessages.removeAll();
+                $.each(data,(index, item) => this.chatMessages.push(item));
+                this.isChatReady(true);
+                this.isChatLoading(false);
+            },
+            error: (xhr, status, errorString) => {
+                alert('Cannot get chat message! ' + errorString);
+                this.isChatLoading(false);
+            },
+            headers: {
+                "Authorization": this.password()
+            }
+        });
+    }
+
+    postChatMessage(sourceKey: string, message: IChatMessage) {
+        this.isChatSending(true);
+        $.ajax('api/Chat/' + sourceKey, {
+            method: 'POST',
+            dataType: 'JSON',
+            data: message,
+            success: (data, status, xhr) => {
+                this.chatMessages.push(message);
+                this.isChatSending(false);
+            },
+            error: (xhr, status, errorString) => {
+                alert('Cannot send message! ' + errorString);
+                this.isChatSending(false);
+            },
+            headers: {
+                "Authorization": this.password()
+            }
+        });
     }
 }
