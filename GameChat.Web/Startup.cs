@@ -13,6 +13,9 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using GameChat.Web.Models;
+using Microsoft.AspNet.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace GameChat.Web
 {
@@ -41,7 +44,20 @@ namespace GameChat.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Add MVC services to the services container.
-            services.AddMvc();
+            services.AddMvc().Configure<MvcOptions>(options =>
+            {
+                int position = options.OutputFormatters.FindIndex(f =>
+                                      f.Instance is JsonOutputFormatter);
+
+                var settings = new JsonSerializerSettings()
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+                var formatter = new JsonOutputFormatter();
+                formatter.SerializerSettings = settings;
+
+                options.OutputFormatters.Insert(position, formatter);
+            }); ;
 
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json

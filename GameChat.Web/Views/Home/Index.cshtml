@@ -3,4 +3,33 @@
 }
 
 <div class="row">
+    <div class="col-lg-12">
+        <form data-bind="visible: !isReady(), disable: isLoading" class="form-horizontal">
+            <input data-bind="text: password" type="password" class="form-control" placeholder="password" />
+            <button data-bind="click: start" class="btn btn-success">Start</button>
+        </form>
+        <select data-bind="
+    visible: isReady, 
+    options: sources, 
+    optionsText: function(item) { return item.name; }, 
+    optionsCaption: 'Choose a source...',
+    value: selectedSource" class="form-control"></select>
+    </div>
 </div>
+<div data-bind="visible: isChatReady" class="row">
+    <div class="col-lg-12">
+        <ul data-bind="foreach: chatMessages" style="height: 500px">
+
+        </ul>
+    </div>
+</div>
+<div data-bind="visible: isChatReady" class="row">
+    <div class="col-lg-12">
+        <input type="text" class="form-control" />
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/lib/knockout/knockout.js"></script>
+    <script src="~/lib/requirejs/require.js" data-main="js/app.js"></script>
+}
