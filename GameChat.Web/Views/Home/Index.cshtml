@@ -28,23 +28,25 @@
         </form>
     </div>
 </div>
-<div data-bind="visible: isChatReady" class="row">
+<div data-bind="visible: isChatReady" class="row chat-list">
     <div class="col-lg-12">
-        <ul data-bind="foreach: chatMessages" style="height: 500px" class="chat-list">
+        <ul data-bind="foreach: chatMessages">
             <li>
-                <p data-bind="text: sender" class="sender"></p>
+                <p data-bind="css: origin() === 'web' ? 'web' : 'game'" class="sender">
+                    <span data-bind="text: sender"></span><span data-bind="text: origin() === 'web' ? ' (web)' : ''"></span>
+                </p>
                 <p data-bind="text: message" class="message"></p>
             </li>
         </ul>
     </div>
 </div>
-<div data-bind="visible: isChatReady" class="row">
-    <div class="col-lg-12">
-        <form data-bind="disable: isChatSending, submit: send" class="form-inline">
-            <input data-bind="value: newMessage, valueUpdate: 'keypress'" type="text" class="form-control" />
-            <input data-bind="disable: !canBeSent()" type="submit" value="Send" class="btn btn-info" />
-        </form>
-    </div>
+<div data-bind="visible: isChatReady" class="row new-chat">
+    <form data-bind="disable: isChatSending, submit: send">
+        <div class="col-lg-11 col-md-10 col-sm-9 col-xs-8">
+            <input data-bind="value: newMessage, valueUpdate: 'keypress'" type="text" class="form-control" style="width: 100%" />
+        </div>
+        <input data-bind="disable: !canBeSent()" type="submit" value="Send" class="btn btn-info col-lg-1 col-md-2 col-sm-3 col-xs-4" />
+    </form>
 </div>
 
 @section scripts{

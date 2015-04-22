@@ -96,7 +96,8 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             var newChat = {
                 timestamp: new Date(),
                 sender: this.source.username,
-                message: this.newMessage()
+                message: this.newMessage(),
+                origin: 'web'
             };
             this.postChatMessage(this.source.key, newChat);
         };

@@ -10,4 +10,5 @@ interface IChatMessage {
     timestamp: Date;
     sender: string;
     message: string;
+    origin: string;
 }

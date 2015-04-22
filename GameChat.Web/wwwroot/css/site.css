@@ -1,6 +1,10 @@
-﻿body {
-    padding-top: 50px;
+﻿html {
+    height: 100%;
+}
+body {
+    padding-top: 15px;
     padding-bottom: 20px;
+    height: 100%;
 }
 
 /* Wrapping element */
@@ -8,20 +12,36 @@
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    height: 100%;
+    position: relative;
 }
 
 /* Set widths on the form inputs since otherwise they're 100% wide */
-input,
+/*input,
 select,
 textarea {
-    max-width: 280px;
+    max-width: 340px;
+}*/
+
+.chat-list {
+    height: calc(100% - 70px);
+    overflow-y: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-ul.chat-list {
+.chat-list ul {
     list-style: none;
     padding: 0;
+    margin-top: 10px;
 }
 
-    ul.chat-list .sender {
+    .chat-list .sender {
         color: gray;
+        margin-bottom: 0;
+        font-size: 0.8em;
     }
+
+.new-chat form {
+    width: 100%;
+}

@@ -124,7 +124,8 @@ export class AppViewModel {
         var newChat: IChatMessage = {
             timestamp: new Date(),
             sender: this.source.username,
-            message: this.newMessage()
+            message: this.newMessage(),
+            origin: 'web'
         };
         this.postChatMessage(this.source.key, newChat);
     }

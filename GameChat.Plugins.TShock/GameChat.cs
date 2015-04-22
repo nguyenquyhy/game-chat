@@ -81,7 +81,8 @@ namespace GameChat.Plugins.TShock
             {
                 sender = name,
                 message = text,
-                timestamp = DateTime.Now
+                timestamp = DateTime.Now,
+                origin = "game"
             };
             var dataString = JsonConvert.SerializeObject(data);
             var content = new StringContent(dataString, Encoding.UTF8, "application/json");
