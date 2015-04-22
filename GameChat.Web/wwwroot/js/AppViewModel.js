@@ -111,6 +111,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                 success: function (data, status, xhr) {
                     _this.chatMessages.removeAll();
                     $.each(data, function (index, item) { return _this.chatMessages.push(new chatVM.ChatMessageViewModel(item)); });
+                    _this.scrollToBottom();
                     _this.isChatReady(true);
                     _this.isChatLoading(false);
                 },
@@ -134,6 +135,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                 success: function (data, status, xhr) {
                     _this.newMessage(null);
                     _this.isChatSending(false);
+                    $('#txtChat').focus();
                 },
                 error: function (xhr, status, errorString) {
                     alert('Cannot send message! ' + errorString);
@@ -148,7 +150,13 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         AppViewModel.prototype.addChatMessage = function (sourceKey, message) {
             if (this.isChatReady() && this.source != null && this.source.key === sourceKey) {
                 this.chatMessages.push(new chatVM.ChatMessageViewModel(message));
+                this.scrollToBottom();
             }
+        };
+        AppViewModel.prototype.scrollToBottom = function () {
+            var chatList = $('#lstChat');
+            var scrollHeight = chatList.prop('scrollHeight');
+            chatList.animate({ scrollTop: scrollHeight }, "fast");
         };
         return AppViewModel;
     })();

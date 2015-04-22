@@ -139,6 +139,7 @@ export class AppViewModel {
             success: (data: IChatMessage[], status, xhr) => {
                 this.chatMessages.removeAll();
                 $.each(data,(index, item) => this.chatMessages.push(new chatVM.ChatMessageViewModel(item)));
+                this.scrollToBottom();
                 this.isChatReady(true);
                 this.isChatLoading(false);
             },
@@ -162,6 +163,7 @@ export class AppViewModel {
             success: (data, status, xhr) => {
                 this.newMessage(null);
                 this.isChatSending(false);
+                $('#txtChat').focus();
             },
             error: (xhr, status, errorString) => {
                 alert('Cannot send message! ' + errorString);
@@ -177,6 +179,13 @@ export class AppViewModel {
     addChatMessage(sourceKey: string, message: IChatMessage) {
         if (this.isChatReady() && this.source != null && this.source.key === sourceKey) {
             this.chatMessages.push(new chatVM.ChatMessageViewModel(message));
+            this.scrollToBottom();
         }
+    }
+
+    scrollToBottom() {
+        var chatList = $('#lstChat');
+        var scrollHeight = chatList.prop('scrollHeight');
+        chatList.animate({ scrollTop: scrollHeight }, "fast");
     }
 }

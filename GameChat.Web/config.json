@@ -11,8 +11,8 @@
 				"Name": "Terraria",
 				"Type": "tshock",
 				"Host": "localhost:7878",
-				"Username": "HunterII",
-				"Password": "3081991"
+				"Username": "test",
+				"Password": "123456"
 			},
 			"terraria-hy": {
 				"Name": "Terraria Hy",
