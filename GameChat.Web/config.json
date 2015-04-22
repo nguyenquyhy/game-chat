@@ -1,12 +1,20 @@
 {
-    "Data": {
-        "DefaultConnection": { 
-            "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-GameChat.Web-3fff31a4-bca1-44b5-adac-6be221a94f26;Trusted_Connection=True;MultipleActiveResultSets=true"
-        }
-    },
-    "EntityFramework": {
-        "ApplicationDbContext": {
-            "ConnectionString": "Data:DefaultConnection:ConnectionString"
-        }
-    }
+	"Data": {
+		"DefaultConnection": {
+			"ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-GameChat.Web-3fff31a4-bca1-44b5-adac-6be221a94f26;Trusted_Connection=True;MultipleActiveResultSets=true"
+		}
+	},
+	"Chat": {
+		"Password": "123",
+		"Servers": {
+			"terraria": {
+				"Name": "Terraria"
+			}
+		}
+	},
+	"EntityFramework": {
+		"ApplicationDbContext": {
+			"ConnectionString": "Data:DefaultConnection:ConnectionString"
+		}
+	}
 }

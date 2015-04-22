@@ -46,7 +46,7 @@ namespace GameChat.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Add MVC services to the services container.
-            services.AddMvc().Configure<MvcOptions>(options =>
+            services.AddMvc(Configuration).Configure<MvcOptions>(options =>
             {
                 int position = options.OutputFormatters.FindIndex(f => f.Instance is JsonOutputFormatter);
 
@@ -67,6 +67,7 @@ namespace GameChat.Web
             services.AddSignalR();
 
             services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
+            services.AddInstance<IConfiguration>(Configuration);
         }
 
         // Configure is called after ConfigureServices is called.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using GameChat.Web.Models;
+using Microsoft.Framework.ConfigurationModel;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,18 +12,21 @@ namespace GameChat.Web.Controllers.Controllers
     [Route("api/[controller]")]
     public class SourcesController : Controller
     {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<SourceModel> Get()
+        private IConfiguration configuration;
+
+        public SourcesController(IConfiguration configuration)
         {
-            return new SourceModel[] { new SourceModel { Key = "test1", Name = "Test1" }, new SourceModel { Key = "test2", Name = "Test2" } };
+            this.configuration = configuration;
         }
 
-        // GET api/values/5
-        [HttpGet("{key}")]
-        public string Get(string key)
+        // GET: api/sources
+        [HttpGet]
+        public ActionResult Get()
         {
-            return "value";
+            var password = configuration.Get("Chat:Password");
+            if (Request.Headers["Authorization"] != password) return new HttpStatusCodeResult(403);
+            var serverKeys = configuration.GetSubKeys("Chat:Servers");
+            return Json(serverKeys.Select(o => new SourceModel { Key = o.Key, Name = configuration.Get("Chat:Servers:" + o.Key + ":Name") }));
         }
     }
 }
