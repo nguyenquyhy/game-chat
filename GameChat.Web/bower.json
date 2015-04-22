@@ -10,7 +10,8 @@
 		"bootstrap-touch-carousel": "^0.8.0",
 		"knockout": "~3.3.0",
 		"requirejs": "~2.1.17",
-		"underscore": "~1.8.3"
+		"underscore": "~1.8.3",
+		"signalr": "~2.2.0"
     },
     "exportsOverride": {
     "bootstrap": {

@@ -33,6 +33,21 @@
 </div>
 
 @section scripts{
+    <script src="~/lib/signalr/jquery.signalR.js"></script>
     <script src="~/lib/knockout/knockout.js"></script>
+    <script src="~/signalr/hubs"></script>
     <script src="~/lib/requirejs/require.js" data-main="js/app.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var chatHub = $.connection.chatHub;
+
+            chatHub.client.echo = function (message) {
+                alert(message);
+            };
+
+            $.connection.hub.start().done(function () {
+                chatHub.server.echo('Test');
+            });
+        });
+    </script>
 }

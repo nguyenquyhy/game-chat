@@ -14,3 +14,4 @@
 /// <reference path="js/appviewmodel.js" />
 /// <reference path="js/models.js" />
 /// <reference path="../scripts/models.js" />
+/// <reference path="lib/signalr/jquery.signalR.js" />

@@ -64,6 +64,8 @@ namespace GameChat.Web
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
 
+            services.AddSignalR();
+
             services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
         }
 
@@ -105,6 +107,8 @@ namespace GameChat.Web
                 // Uncomment the following line to add a route for porting Web API 2 controllers.
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
+
+            app.UseSignalR();
         }
     }
 }
