@@ -2,7 +2,7 @@
 import chatVM = require('ChatMessageViewModel');
 
 export class AppViewModel {
-    password: KnockoutObservable<string>;
+    applicationPassword: KnockoutObservable<string>;
     myId: string;
 
     sources: KnockoutObservableArray<ISourceModel>;
@@ -12,6 +12,11 @@ export class AppViewModel {
     isLoading: KnockoutObservable<boolean>;
 
     source: ISourceModel;
+
+    needGameCredential: KnockoutObservable<boolean>;
+    username: KnockoutObservable<string>;
+    password: KnockoutObservable<string>;
+    token: string;
 
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
@@ -25,7 +30,7 @@ export class AppViewModel {
 
     constructor() {
         this.utils = new utils.Utils();
-        this.password = ko.observable(null);
+        this.applicationPassword = ko.observable(null);
         this.sources = ko.observableArray([]);
         this.selectedSource = ko.pureComputed({
             read: () => {
@@ -42,6 +47,11 @@ export class AppViewModel {
 
         this.isReady = ko.observable(false);
         this.isLoading = ko.observable(false);
+
+        this.needGameCredential = ko.observable(false);
+        this.username = ko.observable(null);
+        this.password = ko.observable(null);
+        this.token = null;
 
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
@@ -77,18 +87,39 @@ export class AppViewModel {
                 this.isLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.password()
+                "Authorization": "Basic " + this.applicationPassword()
             }
         });
     }
 
     sourceSelected() {
         if (this.source !== null) {
-            this.getChatMessages(this.source.key);
+            // TODO
+            this.needGameCredential(true);
         }
         else {
             this.isChatReady(false);
         }
+    }
+
+    login() {
+        $.ajax('api/Sources/Login/' + this.source.key, {
+            method: 'POST',
+            data: {
+                username: this.username(), password: this.password()
+            },
+            success: (data: string, status, xhr) => {
+                this.token = data;
+                this.getChatMessages(this.source.key);
+                this.needGameCredential(false);
+            },
+            error: (xhr, status, errorString) => {
+                alert('Cannot Login! ' + errorString);
+            },
+            headers: {
+                "Authorization": "Basic " + this.applicationPassword()
+            },
+        });
     }
 
     send() {
@@ -117,7 +148,7 @@ export class AppViewModel {
                 this.isChatLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.password()
+                "Authorization": "Basic " + this.applicationPassword()
             }
         });
     }
@@ -138,7 +169,8 @@ export class AppViewModel {
                 this.isChatSending(false);
             },
             headers: {
-                "Authorization": "Basic " + this.password()
+                "Authorization": "Basic " + this.applicationPassword(),
+                "X-TOKEN": this.token
             },
         });
     }

@@ -9,6 +9,7 @@ using Microsoft.AspNet.SignalR.Infrastructure;
 using GameChat.Web.Hubs;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Framework.ConfigurationModel;
+using GameChat.Web.TShock;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -43,6 +44,11 @@ namespace GameChat.Web.Controllers.Controllers
         {
             var password = configuration.Get("Chat:Password");
             if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
+
+            var token = Request.Headers["X-TOKEN"];
+            var api = new TShockRestAPI(configuration.Get("Chat:Servers:" + source + ":Host"));
+            var result = await api.BroadcastAsync(token, message.Message);
+
             await storageLogic.AddMessageAsync(source, message);
             chatHub.Clients.All.addMessage(source, message);
             return new HttpStatusCodeResult(204);

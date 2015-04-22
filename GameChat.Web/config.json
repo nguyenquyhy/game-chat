@@ -9,7 +9,13 @@
 		"Servers": {
 			"terraria": {
 				"Name": "Terraria",
-				"Host": "localhost"
+				"Type": "tshock",
+				"Host": "localhost:7878"
+			},
+			"terraria-hy": {
+				"Name": "Terraria Hy",
+				"Type": "tshock",
+				"Host": "nguyenquyhy.ddns.net:7878"
 			}
 		}
 	},

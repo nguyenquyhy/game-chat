@@ -3,7 +3,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
         function AppViewModel() {
             var _this = this;
             this.utils = new utils.Utils();
-            this.password = ko.observable(null);
+            this.applicationPassword = ko.observable(null);
             this.sources = ko.observableArray([]);
             this.selectedSource = ko.pureComputed({
                 read: function () {
@@ -19,6 +19,10 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
             });
             this.isReady = ko.observable(false);
             this.isLoading = ko.observable(false);
+            this.needGameCredential = ko.observable(false);
+            this.username = ko.observable(null);
+            this.password = ko.observable(null);
+            this.token = null;
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
             this.chatMessages = ko.observableArray([]);
@@ -51,17 +55,39 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.password()
+                    "Authorization": "Basic " + this.applicationPassword()
                 }
             });
         };
         AppViewModel.prototype.sourceSelected = function () {
             if (this.source !== null) {
-                this.getChatMessages(this.source.key);
+                // TODO
+                this.needGameCredential(true);
             }
             else {
                 this.isChatReady(false);
             }
+        };
+        AppViewModel.prototype.login = function () {
+            var _this = this;
+            $.ajax('api/Sources/Login/' + this.source.key, {
+                method: 'POST',
+                data: {
+                    username: this.username(),
+                    password: this.password()
+                },
+                success: function (data, status, xhr) {
+                    _this.token = data;
+                    _this.getChatMessages(_this.source.key);
+                    _this.needGameCredential(false);
+                },
+                error: function (xhr, status, errorString) {
+                    alert('Cannot Login! ' + errorString);
+                },
+                headers: {
+                    "Authorization": "Basic " + this.applicationPassword()
+                },
+            });
         };
         AppViewModel.prototype.send = function () {
             var newChat = {
@@ -89,7 +115,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isChatLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.password()
+                    "Authorization": "Basic " + this.applicationPassword()
                 }
             });
         };
@@ -110,7 +136,8 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isChatSending(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.password()
+                    "Authorization": "Basic " + this.applicationPassword(),
+                    "X-TOKEN": this.token
                 },
             });
         };

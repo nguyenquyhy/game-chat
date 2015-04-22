@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -51,7 +52,6 @@ namespace GameChat.Plugins.TShock
 
         async void PlayerHooks_PlayerChat(TShockAPI.Hooks.PlayerChatEventArgs e)
         {
-            Console.WriteLine("Player Chat!");
             try
             {
                 await SendMessageAsync(Config.Channel, e.Player.Name, e.RawText, e.Player.Group?.Prefix, e.Player.Group?.Suffix);
@@ -64,12 +64,12 @@ namespace GameChat.Plugins.TShock
 
         void OnInitialize(EventArgs e)
         {
-            Console.WriteLine("Initializing Game!");
+            string configPath = Path.Combine(TShockAPI.TShock.SavePath, "gamechatconfig.json");
+            (Config = Config.Read(configPath)).Write(configPath);
         }
 
         async void OnChat(ServerChatEventArgs e)
         {
-            Console.WriteLine("On Chat!");
             var player = TShockAPI.TShock.Players[e.Who];
             await SendMessageAsync(Config.Channel, player.Name, e.Text, player.Group.Prefix, player.Group.Suffix);
         }
