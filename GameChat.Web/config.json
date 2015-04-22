@@ -8,7 +8,8 @@
 		"Password": "123",
 		"Servers": {
 			"terraria": {
-				"Name": "Terraria"
+				"Name": "Terraria",
+				"Host": "localhost"
 			}
 		}
 	},

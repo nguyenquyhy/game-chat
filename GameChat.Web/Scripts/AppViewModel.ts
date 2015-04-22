@@ -77,7 +77,7 @@ export class AppViewModel {
                 this.isLoading(false);
             },
             headers: {
-                "Authorization": this.password()
+                "Authorization": "Basic " + this.password()
             }
         });
     }
@@ -117,7 +117,7 @@ export class AppViewModel {
                 this.isChatLoading(false);
             },
             headers: {
-                "Authorization": this.password()
+                "Authorization": "Basic " + this.password()
             }
         });
     }
@@ -138,7 +138,7 @@ export class AppViewModel {
                 this.isChatSending(false);
             },
             headers: {
-                "Authorization": this.password()
+                "Authorization": "Basic " + this.password()
             },
         });
     }

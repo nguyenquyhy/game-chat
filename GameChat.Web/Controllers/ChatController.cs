@@ -33,7 +33,7 @@ namespace GameChat.Web.Controllers.Controllers
         public async Task<ActionResult> Get(string source)
         {
             var password = configuration.Get("Chat:Password");
-            if (Request.Headers["Authorization"] != password) return new HttpStatusCodeResult(403);
+            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
             return Json(await storageLogic.GetMessageAsync(source));
         }
         
@@ -42,7 +42,7 @@ namespace GameChat.Web.Controllers.Controllers
         public async Task<ActionResult> Post(string source, [FromBody]ChatMessageModel message)
         {
             var password = configuration.Get("Chat:Password");
-            if (Request.Headers["Authorization"] != password) return new HttpStatusCodeResult(403);
+            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
             await storageLogic.AddMessageAsync(source, message);
             chatHub.Clients.All.addMessage(source, message);
             return new HttpStatusCodeResult(204);

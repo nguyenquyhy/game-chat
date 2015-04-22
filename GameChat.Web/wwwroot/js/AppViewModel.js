@@ -51,7 +51,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isLoading(false);
                 },
                 headers: {
-                    "Authorization": this.password()
+                    "Authorization": "Basic " + this.password()
                 }
             });
         };
@@ -89,7 +89,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isChatLoading(false);
                 },
                 headers: {
-                    "Authorization": this.password()
+                    "Authorization": "Basic " + this.password()
                 }
             });
         };
@@ -110,7 +110,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     _this.isChatSending(false);
                 },
                 headers: {
-                    "Authorization": this.password()
+                    "Authorization": "Basic " + this.password()
                 },
             });
         };

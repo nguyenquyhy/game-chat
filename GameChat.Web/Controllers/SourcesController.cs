@@ -24,7 +24,7 @@ namespace GameChat.Web.Controllers.Controllers
         public ActionResult Get()
         {
             var password = configuration.Get("Chat:Password");
-            if (Request.Headers["Authorization"] != password) return new HttpStatusCodeResult(403);
+            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
             var serverKeys = configuration.GetSubKeys("Chat:Servers");
             return Json(serverKeys.Select(o => new SourceModel { Key = o.Key, Name = configuration.Get("Chat:Servers:" + o.Key + ":Name") }));
         }
