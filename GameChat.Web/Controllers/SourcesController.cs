@@ -38,7 +38,11 @@ namespace GameChat.Web.Controllers.Controllers
                 string token = null;
                 if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
                 {
-                    token = await Login(serverKey.Key, username, password);
+                    try
+                    {
+                        token = await Login(serverKey.Key, username, password);
+                    }
+                    catch { }
                 }
                 result.Add(new SourceModel
                 {
