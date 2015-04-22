@@ -4,7 +4,6 @@
 }
 
 interface IChatMessage {
-    isMine: boolean;
     timestamp: Date;
     sender: string;
     message: string;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using GameChat.Web.Models;
+using Microsoft.AspNet.SignalR;
 using System;
 
 namespace GameChat.Web.Hubs

@@ -17,6 +17,7 @@ using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using GameChat.Web.Logics;
+using Microsoft.AspNet.SignalR;
 
 namespace GameChat.Web
 {
@@ -47,8 +48,7 @@ namespace GameChat.Web
             // Add MVC services to the services container.
             services.AddMvc().Configure<MvcOptions>(options =>
             {
-                int position = options.OutputFormatters.FindIndex(f =>
-                                      f.Instance is JsonOutputFormatter);
+                int position = options.OutputFormatters.FindIndex(f => f.Instance is JsonOutputFormatter);
 
                 var settings = new JsonSerializerSettings()
                 {

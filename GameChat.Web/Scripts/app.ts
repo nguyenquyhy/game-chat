@@ -1,4 +1,20 @@
-﻿require(["AppViewModel"], (appVM) => {
-    var viewModel = new appVM.AppViewModel();
-    ko.applyBindings(viewModel);
+﻿import appVM = require("AppViewModel");
+
+var viewModel = new appVM.AppViewModel();
+ko.applyBindings(viewModel);
+
+$.connection.logging = true;
+
+var chatHub = $.connection.chatHub;
+
+chatHub.client.echo = (message) => {
+    alert(message);
+};
+
+chatHub.client.addMessage = (sourceKey, message) => {
+    viewModel.addChatMessage(sourceKey, message);
+}
+
+$.connection.hub.start().done(() => {
+    //chatHub.server.echo('Test');
 });

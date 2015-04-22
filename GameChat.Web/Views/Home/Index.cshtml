@@ -18,16 +18,19 @@
 </div>
 <div data-bind="visible: isChatReady" class="row">
     <div class="col-lg-12">
-        <ul data-bind="foreach: chatMessages" style="height: 500px">
-
+        <ul data-bind="foreach: chatMessages" style="height: 500px" class="chat-list">
+            <li>
+                <p data-bind="text: sender" class="sender"></p>
+                <p data-bind="text: message" class="message"></p>
+            </li>
         </ul>
     </div>
 </div>
 <div data-bind="visible: isChatReady" class="row">
     <div class="col-lg-12">
-        <form class="form-inline">
-            <input data-bind="value: newMessage" type="text" class="form-control" />
-            <button data-bind="click: send" type="button" class="btn btn-info">Send</button>
+        <form data-bind="disable: isChatSending, submit: send" class="form-inline">
+            <input data-bind="value: newMessage, valueUpdate: 'keypress'" type="text" class="form-control" />
+            <button data-bind="click: send, disable: !canBeSent()" type="button" class="btn btn-info">Send</button>
         </form>
     </div>
 </div>
@@ -37,17 +40,4 @@
     <script src="~/lib/knockout/knockout.js"></script>
     <script src="~/signalr/hubs"></script>
     <script src="~/lib/requirejs/require.js" data-main="js/app.js"></script>
-    <script type="text/javascript">
-        $(function () {
-            var chatHub = $.connection.chatHub;
-
-            chatHub.client.echo = function (message) {
-                alert(message);
-            };
-
-            $.connection.hub.start().done(function () {
-                chatHub.server.echo('Test');
-            });
-        });
-    </script>
 }

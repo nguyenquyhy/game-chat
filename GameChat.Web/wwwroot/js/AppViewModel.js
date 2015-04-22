@@ -1,7 +1,8 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (require, exports, utils, chatVM) {
     var AppViewModel = (function () {
         function AppViewModel() {
             var _this = this;
+            this.utils = new utils.Utils();
             this.password = ko.observable(null);
             this.sources = ko.observableArray([]);
             this.selectedSource = ko.pureComputed({
@@ -23,6 +24,9 @@ define(["require", "exports"], function (require, exports) {
             this.chatMessages = ko.observableArray([]);
             this.isChatSending = ko.observable(false);
             this.newMessage = ko.observable(null);
+            this.canBeSent = ko.computed(function () {
+                return _this.newMessage() !== null && _this.newMessage().trim() !== "";
+            });
         }
         AppViewModel.prototype.start = function () {
             this.isReady(false);
@@ -38,6 +42,7 @@ define(["require", "exports"], function (require, exports) {
                 success: function (data, status, xhr) {
                     _this.sources.removeAll();
                     $.each(data, function (index, item) { return _this.sources.push(item); });
+                    _this.myId = _this.utils.guid();
                     _this.isReady(true);
                     _this.isLoading(false);
                 },
@@ -61,9 +66,8 @@ define(["require", "exports"], function (require, exports) {
         AppViewModel.prototype.send = function () {
             var newChat = {
                 timestamp: new Date(),
-                sender: 'Test',
-                message: this.newMessage(),
-                isMine: true
+                sender: this.myId,
+                message: this.newMessage()
             };
             this.postChatMessage(this.source.key, newChat);
         };
@@ -76,7 +80,7 @@ define(["require", "exports"], function (require, exports) {
                 dataType: 'JSON',
                 success: function (data, status, xhr) {
                     _this.chatMessages.removeAll();
-                    $.each(data, function (index, item) { return _this.chatMessages.push(item); });
+                    $.each(data, function (index, item) { return _this.chatMessages.push(new chatVM.ChatMessageViewModel(item)); });
                     _this.isChatReady(true);
                     _this.isChatLoading(false);
                 },
@@ -94,10 +98,11 @@ define(["require", "exports"], function (require, exports) {
             this.isChatSending(true);
             $.ajax('api/Chat/' + sourceKey, {
                 method: 'POST',
-                dataType: 'JSON',
-                data: message,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(message),
                 success: function (data, status, xhr) {
-                    _this.chatMessages.push(message);
+                    _this.newMessage(null);
                     _this.isChatSending(false);
                 },
                 error: function (xhr, status, errorString) {
@@ -106,8 +111,13 @@ define(["require", "exports"], function (require, exports) {
                 },
                 headers: {
                     "Authorization": this.password()
-                }
+                },
             });
+        };
+        AppViewModel.prototype.addChatMessage = function (sourceKey, message) {
+            if (this.isChatReady() && this.source != null && this.source.key === sourceKey) {
+                this.chatMessages.push(new chatVM.ChatMessageViewModel(message));
+            }
         };
         return AppViewModel;
     })();

@@ -8,24 +8,23 @@ namespace GameChat.Web.Logics
 {
     public interface IStorageLogic
     {
-        Task AddMessage(string sourceKey, ChatMessageModel message);
-        Task<IEnumerable<ChatMessageModel>> GetMessage(string sourceKey, DateTime? fromTime = null);
+        Task AddMessageAsync(string sourceKey, ChatMessageModel message);
+        Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, DateTime? fromTime = null);
     }
 
     public class InMemoryStorageLogic : IStorageLogic
     {
         private static Dictionary<string, List<ChatMessageModel>> cachedMessages = new Dictionary<string, List<ChatMessageModel>>();
 
-        public Task AddMessage(string sourceKey, ChatMessageModel message)
+        public Task AddMessageAsync(string sourceKey, ChatMessageModel message)
         {
-            if (cachedMessages.ContainsKey(sourceKey))
-                cachedMessages[sourceKey].Add(message);
-            else
+            if (!cachedMessages.ContainsKey(sourceKey))
                 cachedMessages.Add(sourceKey, new List<ChatMessageModel>());
+            cachedMessages[sourceKey].Add(message);
             return Task.FromResult(true);
         }
 
-        public Task<IEnumerable<ChatMessageModel>> GetMessage(string sourceKey, DateTime? fromTime = null)
+        public Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, DateTime? fromTime = null)
         {
             if (cachedMessages.ContainsKey(sourceKey))
             {

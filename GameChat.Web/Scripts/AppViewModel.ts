@@ -1,5 +1,10 @@
-﻿export class AppViewModel {
+﻿import utils = require('utils');
+import chatVM = require('ChatMessageViewModel');
+
+export class AppViewModel {
     password: KnockoutObservable<string>;
+    myId: string;
+
     sources: KnockoutObservableArray<ISourceModel>;
     selectedSource: KnockoutComputed<ISourceModel>;
 
@@ -10,12 +15,16 @@
 
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
-    chatMessages: KnockoutObservableArray<IChatMessage>;
+    chatMessages: KnockoutObservableArray<chatVM.ChatMessageViewModel>;
 
     isChatSending: KnockoutObservable<boolean>;
+    canBeSent: KnockoutComputed<boolean>;
     newMessage: KnockoutObservable<string>;
 
+    utils: utils.Utils;
+
     constructor() {
+        this.utils = new utils.Utils();
         this.password = ko.observable(null);
         this.sources = ko.observableArray([]);
         this.selectedSource = ko.pureComputed({
@@ -40,6 +49,9 @@
 
         this.isChatSending = ko.observable(false);
         this.newMessage = ko.observable(null);
+        this.canBeSent = ko.computed(() => {
+            return this.newMessage() !== null && this.newMessage().trim() !== "";
+        });
     }
 
     start() {
@@ -56,6 +68,7 @@
             success: (data: ISourceModel[], status, xhr) => {
                 this.sources.removeAll();
                 $.each(data,(index, item) => this.sources.push(item));
+                this.myId = this.utils.guid();
                 this.isReady(true);
                 this.isLoading(false);
             },
@@ -79,11 +92,10 @@
     }
 
     send() {
-        var newChat = {
+        var newChat: IChatMessage = {
             timestamp: new Date(),
-            sender: 'Test',
-            message: this.newMessage(),
-            isMine: true
+            sender: this.myId,
+            message: this.newMessage()
         };
         this.postChatMessage(this.source.key, newChat);
     }
@@ -96,7 +108,7 @@
             dataType: 'JSON',
             success: (data: IChatMessage[], status, xhr) => {
                 this.chatMessages.removeAll();
-                $.each(data,(index, item) => this.chatMessages.push(item));
+                $.each(data,(index, item) => this.chatMessages.push(new chatVM.ChatMessageViewModel(item)));
                 this.isChatReady(true);
                 this.isChatLoading(false);
             },
@@ -114,10 +126,11 @@
         this.isChatSending(true);
         $.ajax('api/Chat/' + sourceKey, {
             method: 'POST',
-            dataType: 'JSON',
-            data: message,
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(message),
             success: (data, status, xhr) => {
-                this.chatMessages.push(message);
+                this.newMessage(null);
                 this.isChatSending(false);
             },
             error: (xhr, status, errorString) => {
@@ -126,7 +139,13 @@
             },
             headers: {
                 "Authorization": this.password()
-            }
+            },
         });
+    }
+
+    addChatMessage(sourceKey: string, message: IChatMessage) {
+        if (this.isChatReady() && this.source != null && this.source.key === sourceKey) {
+            this.chatMessages.push(new chatVM.ChatMessageViewModel(message));
+        }
     }
 }
