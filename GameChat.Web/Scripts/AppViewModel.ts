@@ -1,9 +1,7 @@
-﻿import utils = require('utils');
-import chatVM = require('ChatMessageViewModel');
+﻿import chatVM = require('ChatMessageViewModel');
 
 export class AppViewModel {
     applicationPassword: KnockoutObservable<string>;
-    myId: string;
 
     sources: KnockoutObservableArray<ISourceModel>;
     selectedSource: KnockoutComputed<ISourceModel>;
@@ -25,10 +23,7 @@ export class AppViewModel {
     canBeSent: KnockoutComputed<boolean>;
     newMessage: KnockoutObservable<string>;
 
-    utils: utils.Utils;
-
     constructor() {
-        this.utils = new utils.Utils();
         this.applicationPassword = ko.observable(null);
         this.sources = ko.observableArray([]);
         this.selectedSource = ko.pureComputed({
@@ -76,7 +71,6 @@ export class AppViewModel {
             success: (data: ISourceModel[], status, xhr) => {
                 this.sources.removeAll();
                 $.each(data,(index, item) => this.sources.push(item));
-                this.myId = this.utils.guid();
                 this.isReady(true);
                 this.isLoading(false);
             },
@@ -96,6 +90,7 @@ export class AppViewModel {
                 this.needGameCredential(true);
             }
             else {
+                this.needGameCredential(false);
                 this.getChatMessages(this.source.key);
             }
         }
@@ -111,6 +106,7 @@ export class AppViewModel {
                 username: this.username(), password: this.password()
             },
             success: (data: string, status, xhr) => {
+                this.source.username = this.username();
                 this.source.token = data;
                 this.getChatMessages(this.source.key);
                 this.needGameCredential(false);
@@ -127,7 +123,7 @@ export class AppViewModel {
     send() {
         var newChat: IChatMessage = {
             timestamp: new Date(),
-            sender: this.myId,
+            sender: this.source.username,
             message: this.newMessage()
         };
         this.postChatMessage(this.source.key, newChat);

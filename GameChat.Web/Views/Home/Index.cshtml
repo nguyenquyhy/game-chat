@@ -22,8 +22,8 @@
 <div data-bind="visible: needGameCredential" class="row">
     <div class="col-lg-12">
         <form data-bind="submit: login">
-            <input data-bind="value: username" type="text" placeholder="username" class="form-control" />
-            <input data-bind="value: password" type="password" placeholder="password" class="form-control" />
+            <input data-bind="value: username, valueUpdate: 'keypress'" type="text" placeholder="username" class="form-control" />
+            <input data-bind="value: password, valueUpdate: 'keypress'" type="password" placeholder="password" class="form-control" />
             <input data-bind="disable: username() == null || password() == null" type="submit" value="Log in" class="btn btn-success" />
         </form>
     </div>

@@ -2,6 +2,7 @@
     key: string;
     name: string;
     type: string;
+    username: string;
     token: string;
 }
 

@@ -4,9 +4,7 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.Security.Cookies;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
@@ -37,13 +35,9 @@ namespace GameChat.Web
         public void ConfigureServices(IServiceCollection services)
         {
             // Add EF services to the services container.
-            services.AddEntityFramework(Configuration)
-                .AddSqlServer()
-                .AddDbContext<ApplicationDbContext>();
-
-            // Add Identity services to the services container.
-            services.AddIdentity<ApplicationUser, IdentityRole>(Configuration)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddEntityFramework(Configuration)
+            //    .AddSqlServer()
+            //    .AddDbContext<ApplicationDbContext>();
 
             // Add MVC services to the services container.
             services.AddMvc(Configuration).Configure<MvcOptions>(options =>
@@ -93,9 +87,6 @@ namespace GameChat.Web
 
             // Add static files to the request pipeline.
             app.UseStaticFiles();
-
-            // Add cookie-based authentication to the request pipeline.
-            app.UseIdentity();
 
             // Add MVC to the request pipeline.
             app.UseMvc(routes =>

@@ -45,7 +45,8 @@ namespace GameChat.Web.Controllers.Controllers
                     Key = serverKey.Key,
                     Name = name,
                     Type = type,
-                    Token = token
+                    Token = token,
+                    Username = string.IsNullOrWhiteSpace(token) ? null : username
                 });
             }
             return Json(result);

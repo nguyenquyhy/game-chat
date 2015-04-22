@@ -1,8 +1,7 @@
-define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (require, exports, utils, chatVM) {
+define(["require", "exports", 'ChatMessageViewModel'], function (require, exports, chatVM) {
     var AppViewModel = (function () {
         function AppViewModel() {
             var _this = this;
-            this.utils = new utils.Utils();
             this.applicationPassword = ko.observable(null);
             this.sources = ko.observableArray([]);
             this.selectedSource = ko.pureComputed({
@@ -45,7 +44,6 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                 success: function (data, status, xhr) {
                     _this.sources.removeAll();
                     $.each(data, function (index, item) { return _this.sources.push(item); });
-                    _this.myId = _this.utils.guid();
                     _this.isReady(true);
                     _this.isLoading(false);
                 },
@@ -64,6 +62,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     this.needGameCredential(true);
                 }
                 else {
+                    this.needGameCredential(false);
                     this.getChatMessages(this.source.key);
                 }
             }
@@ -80,6 +79,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     password: this.password()
                 },
                 success: function (data, status, xhr) {
+                    _this.source.username = _this.username();
                     _this.source.token = data;
                     _this.getChatMessages(_this.source.key);
                     _this.needGameCredential(false);
@@ -95,7 +95,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
         AppViewModel.prototype.send = function () {
             var newChat = {
                 timestamp: new Date(),
-                sender: this.myId,
+                sender: this.source.username,
                 message: this.newMessage()
             };
             this.postChatMessage(this.source.key, newChat);

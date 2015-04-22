@@ -30,7 +30,7 @@ namespace GameChat.Web.TShock
         {
             using (var client = new HttpClient())
             {
-                msg = string.Format("({0}-web) {1}", username, msg);
+                msg = string.Format("<{0}-web> {1}", username, msg);
                 var response = await client.GetAsync(string.Format("http://{0}/v2/server/broadcast?token={1}&msg={2}", hostname, token, msg));
                 var responseString = await response.Content.ReadAsStringAsync();
                 return responseString;
