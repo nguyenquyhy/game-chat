@@ -26,10 +26,11 @@ namespace GameChat.Web.TShock
             }
         }
 
-        public async Task<string> BroadcastAsync(string token, string msg)
+        public async Task<string> BroadcastAsync(string token, string username, string msg)
         {
             using (var client = new HttpClient())
             {
+                msg = string.Format("({0}-web) {1}", username, msg);
                 var response = await client.GetAsync(string.Format("http://{0}/v2/server/broadcast?token={1}&msg={2}", hostname, token, msg));
                 var responseString = await response.Content.ReadAsStringAsync();
                 return responseString;

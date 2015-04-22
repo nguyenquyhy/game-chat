@@ -23,12 +23,32 @@ namespace GameChat.Web.Controllers.Controllers
 
         // GET: api/sources
         [HttpGet]
-        public ActionResult Get()
+        public async Task<ActionResult> Get()
         {
-            var password = configuration.Get("Chat:Password");
-            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
+            var applicationPassword = configuration.Get("Chat:Password");
+            if (applicationPassword != null && Request.Headers["Authorization"] != "Basic " + applicationPassword) return new HttpStatusCodeResult(403);
             var serverKeys = configuration.GetSubKeys("Chat:Servers");
-            return Json(serverKeys.Select(o => new SourceModel { Key = o.Key, Name = configuration.Get("Chat:Servers:" + o.Key + ":Name") }));
+            var result = new List<SourceModel>();
+            foreach (var serverKey in serverKeys)
+            {
+                var name = configuration.Get("Chat:Servers:" + serverKey.Key + ":Name");
+                var type = configuration.Get("Chat:Servers:" + serverKey.Key + ":Type");
+                var username = configuration.Get("Chat:Servers:" + serverKey.Key + ":Username");
+                var password = configuration.Get("Chat:Servers:" + serverKey.Key + ":Password");
+                string token = null;
+                if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+                {
+                    token = await Login(serverKey.Key, username, password);
+                }
+                result.Add(new SourceModel
+                {
+                    Key = serverKey.Key,
+                    Name = name,
+                    Type = type,
+                    Token = token
+                });
+            }
+            return Json(result);
         }
 
         [HttpPost("login/{source}")]

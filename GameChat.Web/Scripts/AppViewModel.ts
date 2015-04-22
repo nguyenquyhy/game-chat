@@ -16,7 +16,6 @@ export class AppViewModel {
     needGameCredential: KnockoutObservable<boolean>;
     username: KnockoutObservable<string>;
     password: KnockoutObservable<string>;
-    token: string;
 
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
@@ -51,7 +50,6 @@ export class AppViewModel {
         this.needGameCredential = ko.observable(false);
         this.username = ko.observable(null);
         this.password = ko.observable(null);
-        this.token = null;
 
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
@@ -94,8 +92,12 @@ export class AppViewModel {
 
     sourceSelected() {
         if (this.source !== null) {
-            // TODO
-            this.needGameCredential(true);
+            if (this.source.token == null) {
+                this.needGameCredential(true);
+            }
+            else {
+                this.getChatMessages(this.source.key);
+            }
         }
         else {
             this.isChatReady(false);
@@ -109,7 +111,7 @@ export class AppViewModel {
                 username: this.username(), password: this.password()
             },
             success: (data: string, status, xhr) => {
-                this.token = data;
+                this.source.token = data;
                 this.getChatMessages(this.source.key);
                 this.needGameCredential(false);
             },
@@ -170,7 +172,7 @@ export class AppViewModel {
             },
             headers: {
                 "Authorization": "Basic " + this.applicationPassword(),
-                "X-TOKEN": this.token
+                "X-TOKEN": this.source.token
             },
         });
     }

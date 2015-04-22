@@ -22,7 +22,6 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
             this.needGameCredential = ko.observable(false);
             this.username = ko.observable(null);
             this.password = ko.observable(null);
-            this.token = null;
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
             this.chatMessages = ko.observableArray([]);
@@ -61,8 +60,12 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
         };
         AppViewModel.prototype.sourceSelected = function () {
             if (this.source !== null) {
-                // TODO
-                this.needGameCredential(true);
+                if (this.source.token == null) {
+                    this.needGameCredential(true);
+                }
+                else {
+                    this.getChatMessages(this.source.key);
+                }
             }
             else {
                 this.isChatReady(false);
@@ -77,7 +80,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                     password: this.password()
                 },
                 success: function (data, status, xhr) {
-                    _this.token = data;
+                    _this.source.token = data;
                     _this.getChatMessages(_this.source.key);
                     _this.needGameCredential(false);
                 },
@@ -137,7 +140,7 @@ define(["require", "exports", 'utils', 'ChatMessageViewModel'], function (requir
                 },
                 headers: {
                     "Authorization": "Basic " + this.applicationPassword(),
-                    "X-TOKEN": this.token
+                    "X-TOKEN": this.source.token
                 },
             });
         };
