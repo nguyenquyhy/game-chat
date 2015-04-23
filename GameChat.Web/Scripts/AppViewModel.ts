@@ -131,6 +131,7 @@ export class AppViewModel {
         var newChat: IChatMessage = {
             timestamp: new Date(),
             sender: this.source.username,
+            type: 'Chat',
             message: this.newMessage(),
             origin: 'web'
         };
@@ -147,9 +148,9 @@ export class AppViewModel {
             success: (data: IChatMessage[], status, xhr) => {
                 this.chatMessages.removeAll();
                 $.each(data,(index, item) => this.chatMessages.push(new chatVM.ChatMessageViewModel(item)));
-                this.scrollToBottom();
                 this.isChatReady(true);
                 this.isChatLoading(false);
+                this.scrollToBottom();
             },
             error: (xhr, status, errorString) => {
                 alert('Cannot get chat message! ' + errorString);

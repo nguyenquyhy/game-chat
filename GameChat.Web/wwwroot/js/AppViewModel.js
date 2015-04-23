@@ -104,6 +104,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             var newChat = {
                 timestamp: new Date(),
                 sender: this.source.username,
+                type: 'Chat',
                 message: this.newMessage(),
                 origin: 'web'
             };
@@ -120,9 +121,9 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                 success: function (data, status, xhr) {
                     _this.chatMessages.removeAll();
                     $.each(data, function (index, item) { return _this.chatMessages.push(new chatVM.ChatMessageViewModel(item)); });
-                    _this.scrollToBottom();
                     _this.isChatReady(true);
                     _this.isChatLoading(false);
+                    _this.scrollToBottom();
                 },
                 error: function (xhr, status, errorString) {
                     alert('Cannot get chat message! ' + errorString);

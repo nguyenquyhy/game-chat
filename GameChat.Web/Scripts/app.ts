@@ -15,6 +15,10 @@ chatHub.client.addMessage = (sourceKey, message) => {
     viewModel.addChatMessage(sourceKey, message);
 }
 
+$.connection.hub.stateChanged(change => {
+    console.log('State changed: ' + change.oldState + ' -> ' + change.newState);
+});
+
 $.connection.hub.start().done(() => {
     //chatHub.server.echo('Test');
 });

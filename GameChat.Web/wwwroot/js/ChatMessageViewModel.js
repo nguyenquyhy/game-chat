@@ -2,6 +2,7 @@ define(["require", "exports"], function (require, exports) {
     var ChatMessageViewModel = (function () {
         function ChatMessageViewModel(model) {
             this.sender = ko.observable(model.sender);
+            this.type = ko.observable(model.type);
             this.message = ko.observable(model.message);
             this.timestamp = ko.observable(model.timestamp);
             this.origin = ko.observable(model.origin);

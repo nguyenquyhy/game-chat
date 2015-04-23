@@ -9,6 +9,9 @@ define(["require", "exports", "AppViewModel"], function (require, exports, appVM
     chatHub.client.addMessage = function (sourceKey, message) {
         viewModel.addChatMessage(sourceKey, message);
     };
+    $.connection.hub.stateChanged(function (change) {
+        console.log('State changed: ' + change.oldState + ' -> ' + change.newState);
+    });
     $.connection.hub.start().done(function () {
         //chatHub.server.echo('Test');
     });

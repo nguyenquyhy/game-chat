@@ -9,6 +9,8 @@ namespace GameChat.Web.Models
         public DateTime Timestamp { get; set; }
         [JsonProperty("sender")]
         public string Sender { get; set; }
+        [JsonProperty("type")]
+        public string Type { get; set; }
         [JsonProperty("message")]
         public string Message { get; set; }
         [JsonProperty("origin")]
