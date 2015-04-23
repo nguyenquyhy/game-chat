@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GameChat.Web.Attributes
 {
-    public class SimpleAuthorizeAttribute : AuthorizeAttribute
+    public class SimpleAuthorizeAttribute : AuthorizationFilterAttribute
     {
         private IConfiguration configuration;
 
@@ -13,7 +13,7 @@ namespace GameChat.Web.Attributes
         {
             this.configuration = configuration;
         }
-
+        
         public override Task OnAuthorizationAsync(AuthorizationContext context)
         {
             var applicationPassword = configuration.Get("Chat:Password");
@@ -23,11 +23,11 @@ namespace GameChat.Web.Attributes
                     var header = context.HttpContext.Request.Headers["Authorization"];
                     var data = AuthHelper.ParseBasic(header);
                     if (data.Item1 != applicationPassword)
-                        throw new UnauthorizedAccessException();
+                        Fail(context);
                 }
                 catch
                 {
-                    throw new UnauthorizedAccessException();
+                    Fail(context);
                 }
             }
             return Task.FromResult(true);
