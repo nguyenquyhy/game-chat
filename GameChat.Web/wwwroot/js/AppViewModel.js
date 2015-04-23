@@ -21,6 +21,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             this.needGameCredential = ko.observable(false);
             this.username = ko.observable(null);
             this.password = ko.observable(null);
+            this.isLoggingIn = ko.observable(false);
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
             this.chatMessages = ko.observableArray([]);
@@ -72,6 +73,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         };
         AppViewModel.prototype.login = function () {
             var _this = this;
+            this.isLoggingIn(true);
             $.ajax('api/Sources/' + this.source.key, {
                 method: 'GET',
                 data: {
@@ -81,6 +83,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                 cache: false,
                 success: function (data, status, xhr) {
                     if (_this.source.key === data.key) {
+                        _this.isLoggingIn(false);
                         if (data.token != null) {
                             _this.source.username = data.username;
                             _this.source.token = data.token;
@@ -93,6 +96,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     }
                 },
                 error: function (xhr, status, errorString) {
+                    _this.isLoggingIn(false);
                     alert('Cannot Login! ' + errorString);
                 },
                 headers: {

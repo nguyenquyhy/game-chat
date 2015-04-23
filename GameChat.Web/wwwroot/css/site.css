@@ -35,6 +35,14 @@ body {
         font-size: 0.8em;
     }
 
+    .chat-list .join {
+        color: green;
+    }
+
+    .chat-list .leave {
+        color: darkred;
+    }
+
 .new-chat form {
     width: 100%;
 }

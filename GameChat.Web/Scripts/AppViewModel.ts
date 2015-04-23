@@ -14,6 +14,7 @@ export class AppViewModel {
     needGameCredential: KnockoutObservable<boolean>;
     username: KnockoutObservable<string>;
     password: KnockoutObservable<string>;
+    isLoggingIn: KnockoutObservable<boolean>;
 
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
@@ -45,6 +46,7 @@ export class AppViewModel {
         this.needGameCredential = ko.observable(false);
         this.username = ko.observable(null);
         this.password = ko.observable(null);
+        this.isLoggingIn = ko.observable(false);
 
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
@@ -100,6 +102,7 @@ export class AppViewModel {
     }
 
     login() {
+        this.isLoggingIn(true);
         $.ajax('api/Sources/' + this.source.key, {
             method: 'GET',
             data: {
@@ -108,6 +111,7 @@ export class AppViewModel {
             cache: false,
             success: (data: ISourceModel, status, xhr) => {
                 if (this.source.key === data.key) {
+                    this.isLoggingIn(false);
                     if (data.token != null) {
                         this.source.username = data.username;
                         this.source.token = data.token;
@@ -119,6 +123,7 @@ export class AppViewModel {
                 }
             },
             error: (xhr, status, errorString) => {
+                this.isLoggingIn(false);
                 alert('Cannot Login! ' + errorString);
             },
             headers: {
