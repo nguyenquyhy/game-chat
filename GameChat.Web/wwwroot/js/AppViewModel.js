@@ -52,7 +52,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     _this.isLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 }
             });
         };
@@ -96,7 +96,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     alert('Cannot Login! ' + errorString);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 },
             });
         };
@@ -129,7 +129,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     _this.isChatLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 }
             });
         };
@@ -151,8 +151,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     _this.isChatSending(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword(),
-                    "X-TOKEN": this.source.token
+                    "Authorization": this.getAuthHeader()
                 }
             });
         };
@@ -166,6 +165,12 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             var chatList = $('#lstChat');
             var scrollHeight = chatList.prop('scrollHeight');
             chatList.animate({ scrollTop: scrollHeight }, "fast");
+        };
+        AppViewModel.prototype.getAuthHeader = function () {
+            var token = "";
+            if (this.source != null && this.source.token != null)
+                token = this.source.token;
+            return "Basic " + window.btoa(this.applicationPassword() + ':' + token);
         };
         return AppViewModel;
     })();

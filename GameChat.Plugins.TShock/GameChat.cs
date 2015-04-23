@@ -86,7 +86,8 @@ namespace GameChat.Plugins.TShock
             };
             var dataString = JsonConvert.SerializeObject(data);
             var content = new StringContent(dataString, Encoding.UTF8, "application/json");
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Config.Password);
+            var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(Config.Password + ":"));
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64);
             await client.PostAsync(channel, content);
         }
     }

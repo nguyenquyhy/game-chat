@@ -10,11 +10,13 @@ using GameChat.Web.Hubs;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Framework.ConfigurationModel;
 using GameChat.Web.TShock;
+using GameChat.Web.Attributes;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GameChat.Web.Controllers.Controllers
 {
+    [ServiceFilter(typeof(SimpleAuthorizeAttribute))]
     [Route("api/[controller]")]
     public class ChatController : Controller
     {
@@ -33,8 +35,6 @@ namespace GameChat.Web.Controllers.Controllers
         [HttpGet("{source}")]
         public async Task<ActionResult> Get(string source)
         {
-            var password = configuration.Get("Chat:Password");
-            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
             return Json(await storageLogic.GetMessageAsync(source));
         }
         
@@ -42,10 +42,8 @@ namespace GameChat.Web.Controllers.Controllers
         [HttpPost("{source}")]
         public async Task<ActionResult> Post(string source, [FromBody]ChatMessageModel message)
         {
-            var password = configuration.Get("Chat:Password");
-            if (password != null && Request.Headers["Authorization"] != "Basic " + password) return new HttpStatusCodeResult(403);
-
-            var token = Request.Headers["X-TOKEN"];
+            var data = AuthHelper.ParseBasic(Request.Headers["Authorization"]);
+            var token = data.Item2;
             var api = new TShockRestAPI(configuration.Get("Chat:Servers:" + source + ":Host"));
             var result = await api.BroadcastAsync(token, message.Sender, message.Message);
 

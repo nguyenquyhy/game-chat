@@ -79,7 +79,7 @@ export class AppViewModel {
                 this.isLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             }
         });
     }
@@ -122,7 +122,7 @@ export class AppViewModel {
                 alert('Cannot Login! ' + errorString);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             },
         });
     }
@@ -156,7 +156,7 @@ export class AppViewModel {
                 this.isChatLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             }
         });
     }
@@ -178,8 +178,7 @@ export class AppViewModel {
                 this.isChatSending(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword(),
-                "X-TOKEN": this.source.token
+                "Authorization": this.getAuthHeader()
             }
         });
     }
@@ -195,5 +194,11 @@ export class AppViewModel {
         var chatList = $('#lstChat');
         var scrollHeight = chatList.prop('scrollHeight');
         chatList.animate({ scrollTop: scrollHeight }, "fast");
+    }
+
+    getAuthHeader() {
+        var token = "";
+        if (this.source != null && this.source.token != null) token = this.source.token;
+        return "Basic " + window.btoa(this.applicationPassword() + ':' + token);
     }
 }

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using GameChat.Web.Logics;
 using Microsoft.AspNet.SignalR;
+using GameChat.Web.Attributes;
 
 namespace GameChat.Web
 {
@@ -62,6 +63,7 @@ namespace GameChat.Web
 
             services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
             services.AddInstance<IConfiguration>(Configuration);
+            services.AddInstance<SimpleAuthorizeAttribute>(new SimpleAuthorizeAttribute(Configuration));
         }
 
         // Configure is called after ConfigureServices is called.

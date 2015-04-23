@@ -12,7 +12,7 @@ using GameChat.Web.Attributes;
 
 namespace GameChat.Web.Controllers.Controllers
 {
-    [SimpleAuthorize(isUserBased: false)]
+    [ServiceFilter(typeof(SimpleAuthorizeAttribute))]
     [Route("api/[controller]")]
     public class SourcesController : Controller
     {
