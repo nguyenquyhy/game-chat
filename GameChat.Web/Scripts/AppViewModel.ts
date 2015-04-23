@@ -14,6 +14,7 @@ export class AppViewModel {
     needGameCredential: KnockoutObservable<boolean>;
     username: KnockoutObservable<string>;
     password: KnockoutObservable<string>;
+    remember: KnockoutObservable<boolean>;
     isLoggingIn: KnockoutObservable<boolean>;
 
     isChatLoading: KnockoutObservable<boolean>;
@@ -46,6 +47,7 @@ export class AppViewModel {
         this.needGameCredential = ko.observable(false);
         this.username = ko.observable(null);
         this.password = ko.observable(null);
+        this.remember = ko.observable(false);
         this.isLoggingIn = ko.observable(false);
 
         this.isChatLoading = ko.observable(false);
@@ -70,6 +72,7 @@ export class AppViewModel {
         $.ajax('api/Sources', {
             method: 'GET',
             dataType: 'JSON',
+            cache: false,
             success: (data: ISourceModel[], status, xhr) => {
                 this.sources.removeAll();
                 $.each(data,(index, item) => this.sources.push(item));
@@ -88,7 +91,16 @@ export class AppViewModel {
 
     sourceSelected() {
         if (this.source !== null) {
+            if (this.source.token == null && typeof (Storage) !== "undefined" && localStorage.getItem(this.source.key + ":token") != null) {
+                this.source.token = localStorage.getItem(this.source.key + ":token");
+                this.source.username = localStorage.getItem(this.source.key + ":username");
+            }
+
             if (this.source.token == null) {
+                this.username(null);
+                this.password(null);
+                this.remember(false);
+                this.isChatLoading(false);
                 this.needGameCredential(true);
             }
             else {
@@ -117,6 +129,11 @@ export class AppViewModel {
                         this.source.token = data.token;
                         this.getChatMessages(this.source.key);
                         this.needGameCredential(false);
+
+                        if (this.remember() && typeof (Storage) !== "undefined") {
+                            localStorage.setItem(data.key + ":username", data.username);
+                            localStorage.setItem(data.key + ":token", data.token);
+                        }
                     } else {
                         alert('Cannot Login! Please check your username and password.');
                     }

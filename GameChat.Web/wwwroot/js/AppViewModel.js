@@ -21,6 +21,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             this.needGameCredential = ko.observable(false);
             this.username = ko.observable(null);
             this.password = ko.observable(null);
+            this.remember = ko.observable(false);
             this.isLoggingIn = ko.observable(false);
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
@@ -59,7 +60,15 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         };
         AppViewModel.prototype.sourceSelected = function () {
             if (this.source !== null) {
+                if (this.source.token == null && typeof (Storage) !== "undefined" && localStorage.getItem(this.source.key + ":token") != null) {
+                    this.source.token = localStorage.getItem(this.source.key + ":token");
+                    this.source.username = localStorage.getItem(this.source.key + ":username");
+                }
                 if (this.source.token == null) {
+                    this.username(null);
+                    this.password(null);
+                    this.remember(false);
+                    this.isChatLoading(false);
                     this.needGameCredential(true);
                 }
                 else {
@@ -89,6 +98,10 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                             _this.source.token = data.token;
                             _this.getChatMessages(_this.source.key);
                             _this.needGameCredential(false);
+                            if (_this.remember() && typeof (Storage) !== "undefined") {
+                                localStorage.setItem(data.key + ":username", data.username);
+                                localStorage.setItem(data.key + ":token", data.token);
+                            }
                         }
                         else {
                             alert('Cannot Login! Please check your username and password.');

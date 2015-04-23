@@ -24,6 +24,7 @@
         <form data-bind="submit: login, disable: isLoggingIn">
             <input data-bind="value: username, valueUpdate: 'keypress', disable: isLoggingIn" type="text" placeholder="username" class="form-control" />
             <input data-bind="value: password, valueUpdate: 'keypress', disable: isLoggingIn" type="password" placeholder="password" class="form-control" />
+            <input data-bind="checked: remember, disable: isLoggingIn" type="checkbox" /> Remember me
             <input data-bind="disable: username() == null || password() == null || isLoggingIn()" type="submit" value="Log in" class="btn btn-success" />
         </form>
     </div>
