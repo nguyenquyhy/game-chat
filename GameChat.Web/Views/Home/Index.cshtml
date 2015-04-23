@@ -5,7 +5,7 @@
 <div data-bind="visible: !isReady()" class="row">
     <div class="col-lg-12">
         <form data-bind="disable: isLoading, submit: start" class="form-inline">
-            <input data-bind="value: applicationPassword" type="password" class="form-control" placeholder="password" />
+            <input id="txtAppPassword" data-bind="value: applicationPassword" type="password" class="form-control" placeholder="password" />
             <input type="submit" value="Start" class="btn btn-success" />
         </form>
     </div>
@@ -45,7 +45,9 @@
         <div class="col-lg-11 col-md-11 col-sm-10 col-xs-9">
             <input id="txtChat" data-bind="value: newMessage, valueUpdate: 'keypress'" type="text" class="form-control" style="width: 100%" />
         </div>
-        <input data-bind="disable: !canBeSent()" type="submit" value="Send" class="btn btn-info col-lg-1 col-md-1 col-sm-2 col-xs-3" />
+        <div class="col-lg-1 col-md-1 col-sm-2 col-xs-3">
+            <input data-bind="disable: !canBeSent()" type="submit" value="Send" class="btn btn-info" style="width: 100%" />
+        </div>
     </form>
 </div>
 

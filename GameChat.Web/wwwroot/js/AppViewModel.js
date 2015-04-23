@@ -72,17 +72,25 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         };
         AppViewModel.prototype.login = function () {
             var _this = this;
-            $.ajax('api/Sources/Login/' + this.source.key, {
-                method: 'POST',
+            $.ajax('api/Sources/' + this.source.key, {
+                method: 'GET',
                 data: {
                     username: this.username(),
                     password: this.password()
                 },
+                cache: false,
                 success: function (data, status, xhr) {
-                    _this.source.username = _this.username();
-                    _this.source.token = data;
-                    _this.getChatMessages(_this.source.key);
-                    _this.needGameCredential(false);
+                    if (_this.source.key === data.key) {
+                        if (data.token != null) {
+                            _this.source.username = data.username;
+                            _this.source.token = data.token;
+                            _this.getChatMessages(_this.source.key);
+                            _this.needGameCredential(false);
+                        }
+                        else {
+                            alert('Cannot Login! Please check your username and password.');
+                        }
+                    }
                 },
                 error: function (xhr, status, errorString) {
                     alert('Cannot Login! ' + errorString);
@@ -108,6 +116,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             $.ajax('api/Chat/' + sourceKey, {
                 method: 'GET',
                 dataType: 'JSON',
+                cache: false,
                 success: function (data, status, xhr) {
                     _this.chatMessages.removeAll();
                     $.each(data, function (index, item) { return _this.chatMessages.push(new chatVM.ChatMessageViewModel(item)); });
@@ -144,7 +153,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                 headers: {
                     "Authorization": "Basic " + this.applicationPassword(),
                     "X-TOKEN": this.source.token
-                },
+                }
             });
         };
         AppViewModel.prototype.addChatMessage = function (sourceKey, message) {

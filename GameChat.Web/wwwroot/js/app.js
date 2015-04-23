@@ -12,5 +12,7 @@ define(["require", "exports", "AppViewModel"], function (require, exports, appVM
     $.connection.hub.start().done(function () {
         //chatHub.server.echo('Test');
     });
+    $('.body-content').fadeIn(500);
+    $('#txtAppPassword').focus();
 });
 //# sourceMappingURL=app.js.map

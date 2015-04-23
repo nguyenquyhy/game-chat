@@ -18,3 +18,6 @@ chatHub.client.addMessage = (sourceKey, message) => {
 $.connection.hub.start().done(() => {
     //chatHub.server.echo('Test');
 });
+
+$('.body-content').fadeIn(500);
+$('#txtAppPassword').focus();

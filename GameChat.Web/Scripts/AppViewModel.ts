@@ -100,16 +100,23 @@ export class AppViewModel {
     }
 
     login() {
-        $.ajax('api/Sources/Login/' + this.source.key, {
-            method: 'POST',
+        $.ajax('api/Sources/' + this.source.key, {
+            method: 'GET',
             data: {
                 username: this.username(), password: this.password()
             },
-            success: (data: string, status, xhr) => {
-                this.source.username = this.username();
-                this.source.token = data;
-                this.getChatMessages(this.source.key);
-                this.needGameCredential(false);
+            cache: false,
+            success: (data: ISourceModel, status, xhr) => {
+                if (this.source.key === data.key) {
+                    if (data.token != null) {
+                        this.source.username = data.username;
+                        this.source.token = data.token;
+                        this.getChatMessages(this.source.key);
+                        this.needGameCredential(false);
+                    } else {
+                        alert('Cannot Login! Please check your username and password.');
+                    }
+                }
             },
             error: (xhr, status, errorString) => {
                 alert('Cannot Login! ' + errorString);
@@ -136,6 +143,7 @@ export class AppViewModel {
         $.ajax('api/Chat/' + sourceKey, {
             method: 'GET',
             dataType: 'JSON',
+            cache: false,
             success: (data: IChatMessage[], status, xhr) => {
                 this.chatMessages.removeAll();
                 $.each(data,(index, item) => this.chatMessages.push(new chatVM.ChatMessageViewModel(item)));
@@ -172,7 +180,7 @@ export class AppViewModel {
             headers: {
                 "Authorization": "Basic " + this.applicationPassword(),
                 "X-TOKEN": this.source.token
-            },
+            }
         });
     }
 
