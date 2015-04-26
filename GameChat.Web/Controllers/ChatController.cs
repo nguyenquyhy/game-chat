@@ -47,6 +47,8 @@ namespace GameChat.Web.Controllers.Controllers
             var api = new TShockRestAPI(configuration.Get("Chat:Servers:" + source + ":Host"));
             var result = await api.BroadcastAsync(token, message.Sender, message.Message);
 
+            message.Timestamp = DateTimeOffset.UtcNow;
+
             await storageLogic.AddMessageAsync(source, message);
             chatHub.Clients.All.addMessage(source, message);
             return new HttpStatusCodeResult(204);

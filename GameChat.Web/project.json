@@ -30,7 +30,7 @@
 	},
 	"frameworks": {
 		"aspnet50": { },
-		"aspnetcore50": { }
+		/*"aspnetcore50": { }*/
 	},
 	"exclude": [
 		"wwwroot",

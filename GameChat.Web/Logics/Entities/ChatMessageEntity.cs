@@ -8,6 +8,8 @@ namespace GameChat.Web.Logics.Entities
 {
     public class ChatMessageEntity : TableEntity, IChatMessageModel
     {
+        public ChatMessageEntity() { }
+
         public ChatMessageEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey)
         {
         }
@@ -19,6 +21,18 @@ namespace GameChat.Web.Logics.Entities
             this.Sender = model.Sender;
             this.Type = model.Type;
             this.Timestamp = model.Timestamp;
+        }
+
+        public ChatMessageModel ToModel()
+        {
+            return new ChatMessageModel
+            {
+                Message = Message,
+                Origin = Origin,
+                Sender = Sender,
+                Type = Type,
+                Timestamp = Timestamp
+            };
         }
 
         public string Message { get; set; }

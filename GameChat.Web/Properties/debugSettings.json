@@ -1,0 +1,9 @@
+{
+  "profiles": [
+    {
+      "name": "IIS Express",
+      "launchBrowser": true,
+      "sdkVersion": "kre-clr-win-x86.1.0.0-beta3"
+    }
+  ]
+}

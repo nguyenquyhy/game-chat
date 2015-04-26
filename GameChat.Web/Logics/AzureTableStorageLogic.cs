@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameChat.Web.Models;
@@ -6,6 +7,7 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Diagnostics;
+using GameChat.Web.Logics.Entities;
 
 namespace GameChat.Web.Logics
 {
@@ -28,14 +30,25 @@ namespace GameChat.Web.Logics
             }
         }
 
-        public Task AddMessageAsync(string sourceKey, ChatMessageModel message)
+        public async Task AddMessageAsync(string sourceKey, ChatMessageModel message)
         {
-            throw new NotImplementedException();            
+            var operation = TableOperation.Insert(new ChatMessageEntity
+                (sourceKey, string.Format("{0:D19}", DateTimeOffset.MaxValue.Ticks - message.Timestamp.Ticks), message));
+            var result = await table.ExecuteAsync(operation);
         }
 
-        public Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, DateTime? fromTime = default(DateTime?))
+        public async Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, int? countLimit = 100)
         {
-            throw new NotImplementedException();
+            var result = new List<ChatMessageModel>();
+                TableContinuationToken token = null;
+            do
+            {
+                var segmentResult = await table.ExecuteQuerySegmentedAsync(new TableQuery<ChatMessageEntity>(), token);
+                result.AddRange(segmentResult.Results.Select(r => r.ToModel()));
+                token = segmentResult.ContinuationToken;
+            }
+            while (token != null && (!countLimit.HasValue || result.Count < countLimit.Value));
+            return result;
         }
     }
 }

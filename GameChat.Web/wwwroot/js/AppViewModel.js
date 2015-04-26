@@ -2,6 +2,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
     var AppViewModel = (function () {
         function AppViewModel() {
             var _this = this;
+            this.hasLocalStorage = ko.observable(typeof (Storage) !== "undefined");
             this.applicationPassword = ko.observable(null);
             this.sources = ko.observableArray([]);
             this.selectedSource = ko.pureComputed({
@@ -43,6 +44,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             $.ajax('api/Sources', {
                 method: 'GET',
                 dataType: 'JSON',
+                cache: false,
                 success: function (data, status, xhr) {
                     _this.sources.removeAll();
                     $.each(data, function (index, item) { return _this.sources.push(item); });
