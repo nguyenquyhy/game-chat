@@ -1,6 +1,8 @@
 ﻿import chatVM = require('ChatMessageViewModel');
 
 export class AppViewModel {
+    hasLocalStorage: KnockoutObservable<boolean>;
+
     applicationPassword: KnockoutObservable<string>;
 
     sources: KnockoutObservableArray<ISourceModel>;
@@ -26,6 +28,8 @@ export class AppViewModel {
     newMessage: KnockoutObservable<string>;
 
     constructor() {
+        this.hasLocalStorage = ko.observable(typeof (Storage) !== "undefined");
+
         this.applicationPassword = ko.observable(null);
         this.sources = ko.observableArray([]);
         this.selectedSource = ko.pureComputed({
