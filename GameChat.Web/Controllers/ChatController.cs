@@ -35,7 +35,7 @@ namespace GameChat.Web.Controllers.Controllers
         [HttpGet("{source}")]
         public async Task<ActionResult> Get(string source)
         {
-            return Json(await storageLogic.GetMessageAsync(source));
+            return Json((await storageLogic.GetMessageAsync(source)).OrderBy(o => o.Timestamp));
         }
         
         // POST api/values
