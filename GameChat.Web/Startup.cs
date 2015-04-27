@@ -61,8 +61,14 @@ namespace GameChat.Web
 
             services.AddSignalR();
 
-            //services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
-            services.AddInstance<IStorageLogic>(new AzureTableStorageLogic(Configuration));
+            if (Configuration.Get("Data:Type") == "AzureStorage")
+            {
+                services.AddInstance<IStorageLogic>(new AzureTableStorageLogic(Configuration));
+            }
+            else
+            { 
+                services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
+            }
             services.AddInstance<IConfiguration>(Configuration);
             services.AddInstance<SimpleAuthorizeAttribute>(new SimpleAuthorizeAttribute(Configuration));
         }

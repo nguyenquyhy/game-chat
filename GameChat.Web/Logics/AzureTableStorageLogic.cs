@@ -23,7 +23,10 @@ namespace GameChat.Web.Logics
             this.configuration = configuration;
             var account = CloudStorageAccount.Parse(configuration.Get("Data:AzureStorage:ConnectionString"));
             var tableClient = account.CreateCloudTableClient();
-            table = tableClient.GetTableReference(DefaultTableName);
+            var tableName = configuration.Get("Data:AzureStorage:TableName");
+            if (string.IsNullOrEmpty(tableName))
+                tableName = DefaultTableName;
+            table = tableClient.GetTableReference(tableName);
             if (table.CreateIfNotExists())
             {
                 Trace.TraceInformation($"Table {table.Name} is created!");
