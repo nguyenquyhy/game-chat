@@ -17,6 +17,7 @@ using Newtonsoft.Json.Serialization;
 using GameChat.Web.Logics;
 using Microsoft.AspNet.SignalR;
 using GameChat.Web.Attributes;
+using System.Diagnostics;
 
 namespace GameChat.Web
 {
@@ -64,10 +65,12 @@ namespace GameChat.Web
             if (Configuration.Get("Data:Type") == "AzureStorage")
             {
                 services.AddInstance<IStorageLogic>(new AzureTableStorageLogic(Configuration));
+                Trace.TraceInformation("Initialized AzureStorage");
             }
             else
             { 
                 services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
+                Trace.TraceInformation("Initialized InMemoryStorage");
             }
             services.AddInstance<IConfiguration>(Configuration);
             services.AddInstance<SimpleAuthorizeAttribute>(new SimpleAuthorizeAttribute(Configuration));
