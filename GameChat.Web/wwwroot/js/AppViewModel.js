@@ -27,11 +27,21 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
             this.chatMessages = ko.observableArray([]);
+            this.unreadCount = ko.observable(0);
             this.isChatSending = ko.observable(false);
             this.newMessage = ko.observable(null);
             this.canBeSent = ko.computed(function () {
                 return _this.newMessage() !== null && _this.newMessage().trim() !== "";
             });
+            this.isBlur = ko.observable(false);
+            window.onblur = function () {
+                _this.isBlur(true);
+            };
+            window.onfocus = function () {
+                _this.isBlur(false);
+                _this.unreadCount(0);
+                document.title = 'GameChat';
+            };
         }
         AppViewModel.prototype.start = function () {
             this.isReady(false);

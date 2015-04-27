@@ -1,6 +1,6 @@
 {
 	"Data": {
-		"Type": "AzureStorage",
+		"Type": "InMemory",
 		"DefaultConnection": {
 			"ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-GameChat.Web-3fff31a4-bca1-44b5-adac-6be221a94f26;Trusted_Connection=True;MultipleActiveResultSets=true"
 		},

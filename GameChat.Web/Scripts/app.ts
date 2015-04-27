@@ -13,6 +13,10 @@ chatHub.client.echo = (message) => {
 
 chatHub.client.addMessage = (sourceKey, message) => {
     viewModel.addChatMessage(sourceKey, message);
+    if (viewModel.isBlur()) {
+        viewModel.unreadCount(viewModel.unreadCount() + 1);
+        document.title = viewModel.unreadCount() + " new message" + (viewModel.unreadCount() > 1 ? "s" : "") + " - GameChat";
+    }
 }
 
 $.connection.hub.stateChanged(change => {

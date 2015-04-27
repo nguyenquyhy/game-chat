@@ -22,10 +22,13 @@ export class AppViewModel {
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
     chatMessages: KnockoutObservableArray<chatVM.ChatMessageViewModel>;
+    unreadCount: KnockoutObservable<number>;
 
     isChatSending: KnockoutObservable<boolean>;
     canBeSent: KnockoutComputed<boolean>;
     newMessage: KnockoutObservable<string>;
+
+    isBlur: KnockoutObservable<boolean>;
 
     constructor() {
         this.hasLocalStorage = ko.observable(typeof (Storage) !== "undefined");
@@ -57,12 +60,23 @@ export class AppViewModel {
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
         this.chatMessages = ko.observableArray([]);
+        this.unreadCount = ko.observable(0);
 
         this.isChatSending = ko.observable(false);
         this.newMessage = ko.observable(null);
         this.canBeSent = ko.computed(() => {
             return this.newMessage() !== null && this.newMessage().trim() !== "";
         });
+
+        this.isBlur = ko.observable(false);
+        window.onblur = () => {
+            this.isBlur(true);
+        };
+        window.onfocus = () => {
+            this.isBlur(false);
+            this.unreadCount(0);
+            document.title = 'GameChat';
+        }
     }
 
     start() {

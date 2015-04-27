@@ -1,8 +1,4 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
-
-<div data-bind="visible: !isReady()" class="row">
+﻿<div data-bind="visible: !isReady()" class="row">
     <div class="col-lg-12">
         <form data-bind="disable: isLoading, submit: start" class="form-inline">
             <input id="txtAppPassword" data-bind="value: applicationPassword, disable: isLoading" type="password" class="form-control" placeholder="password" />

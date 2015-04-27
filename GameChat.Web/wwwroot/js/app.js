@@ -8,6 +8,10 @@ define(["require", "exports", "AppViewModel"], function (require, exports, appVM
     };
     chatHub.client.addMessage = function (sourceKey, message) {
         viewModel.addChatMessage(sourceKey, message);
+        if (viewModel.isBlur()) {
+            viewModel.unreadCount(viewModel.unreadCount() + 1);
+            document.title = viewModel.unreadCount() + " new message" + (viewModel.unreadCount() > 1 ? "s" : "") + " - GameChat";
+        }
     };
     $.connection.hub.stateChanged(function (change) {
         console.log('State changed: ' + change.oldState + ' -> ' + change.newState);
