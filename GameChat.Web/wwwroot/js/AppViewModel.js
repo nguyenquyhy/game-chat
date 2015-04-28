@@ -131,7 +131,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         };
         AppViewModel.prototype.send = function () {
             var newChat = {
-                timestamp: new Date(),
+                timestamp: (new Date()).toISOString(),
                 sender: this.source.username,
                 type: 'Chat',
                 message: this.newMessage(),
@@ -206,4 +206,3 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
     })();
     exports.AppViewModel = AppViewModel;
 });
-//# sourceMappingURL=AppViewModel.js.map

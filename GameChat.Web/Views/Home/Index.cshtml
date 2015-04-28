@@ -29,6 +29,9 @@
     <div class="col-lg-12">
         <ul data-bind="foreach: chatMessages">
             <li>
+                <div style="float: right">
+                    <p data-bind="text: friendlyTimestamp" class="time"></p>
+                </div>
                 <div data-bind="if: type() == 'Chat' || type() == null" class="chat">
                     <p data-bind="css: origin() === 'web' ? 'web' : 'game'" class="sender">
                         <span data-bind="text: sender"></span><span data-bind="text: origin() === 'web' ? ' (web)' : ''"></span>

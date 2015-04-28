@@ -43,6 +43,11 @@ body {
         color: darkred;
     }
 
+    .chat-list .time {
+        color: gray;
+        font-size: 0.7em;
+    }
+
 .new-chat form {
     width: 100%;
 }

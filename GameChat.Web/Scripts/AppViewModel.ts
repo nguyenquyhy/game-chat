@@ -169,7 +169,7 @@ export class AppViewModel {
 
     send() {
         var newChat: IChatMessage = {
-            timestamp: new Date(),
+            timestamp: (new Date()).toISOString(),
             sender: this.source.username,
             type: 'Chat',
             message: this.newMessage(),

@@ -22,4 +22,3 @@ define(["require", "exports", "AppViewModel"], function (require, exports, appVM
     $('.body-content').fadeIn(500);
     $('#txtAppPassword').focus();
 });
-//# sourceMappingURL=app.js.map
