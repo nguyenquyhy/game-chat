@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
@@ -16,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using GameChat.Web.Logics;
 using Microsoft.AspNet.SignalR;
+using System.Linq;
 
 namespace GameChat.Web
 {
@@ -40,19 +40,19 @@ namespace GameChat.Web
             //    .AddDbContext<ApplicationDbContext>();
 
             // Add MVC services to the services container.
-            services.AddMvc(Configuration).Configure<MvcOptions>(options =>
+            services.AddMvc().Configure<MvcOptions>(options =>
             {
-                int position = options.OutputFormatters.FindIndex(f => f.Instance is JsonOutputFormatter);
+                var formatter = (JsonOutputFormatter)options.OutputFormatters.FirstOrDefault(f => f.Instance is JsonOutputFormatter).Instance;
 
-                var settings = new JsonSerializerSettings()
+                if (formatter != null)
                 {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
-                var formatter = new JsonOutputFormatter();
-                formatter.SerializerSettings = settings;
-
-                options.OutputFormatters.Insert(position, formatter);
-            }); ;
+                    var settings = new JsonSerializerSettings()
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    };
+                    formatter.SerializerSettings = settings;
+                }
+            });
 
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
@@ -76,7 +76,6 @@ namespace GameChat.Web
             {
                 app.UseBrowserLink();
                 app.UseErrorPage(ErrorPageOptions.ShowAll);
-                app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
             }
             else
             {

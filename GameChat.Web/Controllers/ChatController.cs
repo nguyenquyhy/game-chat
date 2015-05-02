@@ -10,8 +10,7 @@ using GameChat.Web.Hubs;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Framework.ConfigurationModel;
 using GameChat.Web.TShock;
-
-// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.Net.Http.Server;
 
 namespace GameChat.Web.Controllers.Controllers
 {

@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22609.0
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GameChat.Web", "GameChat.Web\GameChat.Web.kproj", "{CE9FD45B-E336-4BE7-9585-E4398E0A42E5}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GameChat.Web", "GameChat.Web\GameChat.Web.xproj", "{CE9FD45B-E336-4BE7-9585-E4398E0A42E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameChat.Plugins.TShock", "GameChat.Plugins.TShock\GameChat.Plugins.TShock.csproj", "{6C4F7F98-9099-4CF3-9E8D-358304684BE5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GameChat.Web.TShock", "GameChat.Web.TShock\GameChat.Web.TShock.kproj", "{39104259-AB28-4A73-A022-EAD631976CE5}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GameChat.Web.TShock", "GameChat.Web.TShock\GameChat.Web.TShock.xproj", "{39104259-AB28-4A73-A022-EAD631976CE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
