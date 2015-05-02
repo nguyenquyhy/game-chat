@@ -9,7 +9,7 @@ namespace GameChat.Web.Logics
     public interface IStorageLogic
     {
         Task AddMessageAsync(string sourceKey, ChatMessageModel message);
-        Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, DateTime? fromTime = null);
+        Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, int? countLimit = 100);
     }
 
     public class InMemoryStorageLogic : IStorageLogic
@@ -24,12 +24,12 @@ namespace GameChat.Web.Logics
             return Task.FromResult(true);
         }
 
-        public Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, DateTime? fromTime = null)
+        public Task<IEnumerable<ChatMessageModel>> GetMessageAsync(string sourceKey, int? countLimit = 100)
         {
             if (cachedMessages.ContainsKey(sourceKey))
             {
-                if (fromTime.HasValue)
-                    return Task.FromResult(cachedMessages[sourceKey].Where(o => o.Timestamp > fromTime.Value));
+                if (countLimit.HasValue)
+                    return Task.FromResult(cachedMessages[sourceKey].OrderByDescending(o => o.Timestamp).Take(countLimit.Value));
                 else
                     return Task.FromResult(cachedMessages[sourceKey].AsEnumerable());
             }

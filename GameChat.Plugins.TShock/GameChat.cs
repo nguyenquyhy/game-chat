@@ -46,15 +46,48 @@ namespace GameChat.Plugins.TShock
         public override void Initialize()
         {
             ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
-            //ServerApi.Hooks.ServerChat.Register(this, OnChat);
             TShockAPI.Hooks.PlayerHooks.PlayerChat += PlayerHooks_PlayerChat;
+            TShockAPI.Hooks.PlayerHooks.PlayerCommand += PlayerHooks_PlayerCommand;
+            ServerApi.Hooks.ServerJoin.Register(this, OnServerJoin);
+            ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
+        }
+
+        private async void OnServerJoin(JoinEventArgs e)
+        {
+            try
+            {
+                var player = Main.player[e.Who];
+                await SendMessageAsync(Config.Channel, player.name, "Join", null, null, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Cannot send to GameChat! " + ex.Message);
+            }
+        }
+
+        private async void OnServerLeave(LeaveEventArgs e)
+        {
+            try
+            {
+                var player = Main.player[e.Who];
+                await SendMessageAsync(Config.Channel, player.name, "Leave", null, null, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Cannot send to GameChat! " + ex.Message);
+            }
+        }
+
+        private void PlayerHooks_PlayerCommand(TShockAPI.Hooks.PlayerCommandEventArgs e)
+        {
+            
         }
 
         async void PlayerHooks_PlayerChat(TShockAPI.Hooks.PlayerChatEventArgs e)
         {
             try
             {
-                await SendMessageAsync(Config.Channel, e.Player.Name, e.RawText, e.Player.Group?.Prefix, e.Player.Group?.Suffix);
+                await SendMessageAsync(Config.Channel, e.Player.Name, "Chat", e.RawText, e.Player.Group?.Prefix, e.Player.Group?.Suffix);
             }
             catch(Exception ex)
             {
@@ -68,25 +101,21 @@ namespace GameChat.Plugins.TShock
             (Config = Config.Read(configPath)).Write(configPath);
         }
 
-        async void OnChat(ServerChatEventArgs e)
-        {
-            var player = TShockAPI.TShock.Players[e.Who];
-            await SendMessageAsync(Config.Channel, player.Name, e.Text, player.Group.Prefix, player.Group.Suffix);
-        }
-
-        private async Task SendMessageAsync(string channel, string name, string text, string prefix, string suffix)
+        private async Task SendMessageAsync(string channel, string name, string type, string text, string prefix, string suffix)
         {
             var client = new HttpClient();
             var data = new
             {
                 sender = name,
+                type = type,
                 message = text,
                 timestamp = DateTime.Now,
                 origin = "game"
             };
             var dataString = JsonConvert.SerializeObject(data);
             var content = new StringContent(dataString, Encoding.UTF8, "application/json");
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Config.Password);
+            var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(Config.Password + ":"));
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64);
             await client.PostAsync(channel, content);
         }
     }

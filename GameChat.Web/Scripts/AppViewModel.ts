@@ -1,6 +1,8 @@
 ﻿import chatVM = require('ChatMessageViewModel');
 
 export class AppViewModel {
+    hasLocalStorage: KnockoutObservable<boolean>;
+
     applicationPassword: KnockoutObservable<string>;
 
     sources: KnockoutObservableArray<ISourceModel>;
@@ -14,16 +16,23 @@ export class AppViewModel {
     needGameCredential: KnockoutObservable<boolean>;
     username: KnockoutObservable<string>;
     password: KnockoutObservable<string>;
+    remember: KnockoutObservable<boolean>;
+    isLoggingIn: KnockoutObservable<boolean>;
 
     isChatLoading: KnockoutObservable<boolean>;
     isChatReady: KnockoutObservable<boolean>;
     chatMessages: KnockoutObservableArray<chatVM.ChatMessageViewModel>;
+    unreadCount: KnockoutObservable<number>;
 
     isChatSending: KnockoutObservable<boolean>;
     canBeSent: KnockoutComputed<boolean>;
     newMessage: KnockoutObservable<string>;
 
+    isBlur: KnockoutObservable<boolean>;
+
     constructor() {
+        this.hasLocalStorage = ko.observable(typeof (Storage) !== "undefined");
+
         this.applicationPassword = ko.observable(null);
         this.sources = ko.observableArray([]);
         this.selectedSource = ko.pureComputed({
@@ -45,16 +54,29 @@ export class AppViewModel {
         this.needGameCredential = ko.observable(false);
         this.username = ko.observable(null);
         this.password = ko.observable(null);
+        this.remember = ko.observable(false);
+        this.isLoggingIn = ko.observable(false);
 
         this.isChatLoading = ko.observable(false);
         this.isChatReady = ko.observable(false);
         this.chatMessages = ko.observableArray([]);
+        this.unreadCount = ko.observable(0);
 
         this.isChatSending = ko.observable(false);
         this.newMessage = ko.observable(null);
         this.canBeSent = ko.computed(() => {
             return this.newMessage() !== null && this.newMessage().trim() !== "";
         });
+
+        this.isBlur = ko.observable(false);
+        window.onblur = () => {
+            this.isBlur(true);
+        };
+        window.onfocus = () => {
+            this.isBlur(false);
+            this.unreadCount(0);
+            document.title = 'GameChat';
+        }
     }
 
     start() {
@@ -68,6 +90,7 @@ export class AppViewModel {
         $.ajax('api/Sources', {
             method: 'GET',
             dataType: 'JSON',
+            cache: false,
             success: (data: ISourceModel[], status, xhr) => {
                 this.sources.removeAll();
                 $.each(data,(index, item) => this.sources.push(item));
@@ -79,14 +102,23 @@ export class AppViewModel {
                 this.isLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             }
         });
     }
 
     sourceSelected() {
         if (this.source !== null) {
+            if (this.source.token == null && typeof (Storage) !== "undefined" && localStorage.getItem(this.source.key + ":token") != null) {
+                this.source.token = localStorage.getItem(this.source.key + ":token");
+                this.source.username = localStorage.getItem(this.source.key + ":username");
+            }
+
             if (this.source.token == null) {
+                this.username(null);
+                this.password(null);
+                this.remember(false);
+                this.isChatLoading(false);
                 this.needGameCredential(true);
             }
             else {
@@ -100,30 +132,46 @@ export class AppViewModel {
     }
 
     login() {
-        $.ajax('api/Sources/Login/' + this.source.key, {
-            method: 'POST',
+        this.isLoggingIn(true);
+        $.ajax('api/Sources/' + this.source.key, {
+            method: 'GET',
             data: {
                 username: this.username(), password: this.password()
             },
-            success: (data: string, status, xhr) => {
-                this.source.username = this.username();
-                this.source.token = data;
-                this.getChatMessages(this.source.key);
-                this.needGameCredential(false);
+            cache: false,
+            success: (data: ISourceModel, status, xhr) => {
+                if (this.source.key === data.key) {
+                    this.isLoggingIn(false);
+                    if (data.token != null) {
+                        this.source.username = data.username;
+                        this.source.token = data.token;
+                        this.getChatMessages(this.source.key);
+                        this.needGameCredential(false);
+
+                        if (this.remember() && typeof (Storage) !== "undefined") {
+                            localStorage.setItem(data.key + ":username", data.username);
+                            localStorage.setItem(data.key + ":token", data.token);
+                        }
+                    } else {
+                        alert('Cannot Login! Please check your username and password.');
+                    }
+                }
             },
             error: (xhr, status, errorString) => {
+                this.isLoggingIn(false);
                 alert('Cannot Login! ' + errorString);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             },
         });
     }
 
     send() {
         var newChat: IChatMessage = {
-            timestamp: new Date(),
+            timestamp: (new Date()).toISOString(),
             sender: this.source.username,
+            type: 'Chat',
             message: this.newMessage(),
             origin: 'web'
         };
@@ -136,19 +184,20 @@ export class AppViewModel {
         $.ajax('api/Chat/' + sourceKey, {
             method: 'GET',
             dataType: 'JSON',
+            cache: false,
             success: (data: IChatMessage[], status, xhr) => {
                 this.chatMessages.removeAll();
                 $.each(data,(index, item) => this.chatMessages.push(new chatVM.ChatMessageViewModel(item)));
-                this.scrollToBottom();
                 this.isChatReady(true);
                 this.isChatLoading(false);
+                this.scrollToBottom();
             },
             error: (xhr, status, errorString) => {
                 alert('Cannot get chat message! ' + errorString);
                 this.isChatLoading(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword()
+                "Authorization": this.getAuthHeader()
             }
         });
     }
@@ -170,9 +219,8 @@ export class AppViewModel {
                 this.isChatSending(false);
             },
             headers: {
-                "Authorization": "Basic " + this.applicationPassword(),
-                "X-TOKEN": this.source.token
-            },
+                "Authorization": this.getAuthHeader()
+            }
         });
     }
 
@@ -187,5 +235,11 @@ export class AppViewModel {
         var chatList = $('#lstChat');
         var scrollHeight = chatList.prop('scrollHeight');
         chatList.animate({ scrollTop: scrollHeight }, "fast");
+    }
+
+    getAuthHeader() {
+        var token = "";
+        if (this.source != null && this.source.token != null) token = this.source.token;
+        return "Basic " + window.btoa(this.applicationPassword() + ':' + token);
     }
 }

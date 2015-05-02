@@ -1,12 +1,8 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
-
-<div data-bind="visible: !isReady()" class="row">
+﻿<div data-bind="visible: !isReady()" class="row">
     <div class="col-lg-12">
         <form data-bind="disable: isLoading, submit: start" class="form-inline">
-            <input data-bind="value: applicationPassword" type="password" class="form-control" placeholder="password" />
-            <input type="submit" value="Start" class="btn btn-success" />
+            <input id="txtAppPassword" data-bind="value: applicationPassword, disable: isLoading" type="password" class="form-control" placeholder="password" />
+            <input data-bind="disable: isLoading" type="submit" value="Start" class="btn btn-success" />
         </form>
     </div>
 </div>
@@ -21,10 +17,11 @@
 </div>
 <div data-bind="visible: needGameCredential" class="row">
     <div class="col-lg-12">
-        <form data-bind="submit: login">
-            <input data-bind="value: username, valueUpdate: 'keypress'" type="text" placeholder="username" class="form-control" />
-            <input data-bind="value: password, valueUpdate: 'keypress'" type="password" placeholder="password" class="form-control" />
-            <input data-bind="disable: username() == null || password() == null" type="submit" value="Log in" class="btn btn-success" />
+        <form data-bind="submit: login, disable: isLoggingIn">
+            <input data-bind="value: username, valueUpdate: 'keypress', disable: isLoggingIn" type="text" placeholder="username" class="form-control" />
+            <input data-bind="value: password, valueUpdate: 'keypress', disable: isLoggingIn" type="password" placeholder="password" class="form-control" />
+            <input data-bind="checked: remember, disable: isLoggingIn() || !hasLocalStorage()" type="checkbox" /> Remember me<br />
+            <input data-bind="disable: username() == null || password() == null || isLoggingIn()" type="submit" value="Log in" class="btn btn-success" />
         </form>
     </div>
 </div>
@@ -32,10 +29,21 @@
     <div class="col-lg-12">
         <ul data-bind="foreach: chatMessages">
             <li>
-                <p data-bind="css: origin() === 'web' ? 'web' : 'game'" class="sender">
-                    <span data-bind="text: sender"></span><span data-bind="text: origin() === 'web' ? ' (web)' : ''"></span>
-                </p>
-                <p data-bind="text: message" class="message"></p>
+                <div style="float: right">
+                    <p data-bind="text: friendlyTimestamp" class="time"></p>
+                </div>
+                <div data-bind="if: type() == 'Chat' || type() == null" class="chat">
+                    <p data-bind="css: origin() === 'web' ? 'web' : 'game'" class="sender">
+                        <span data-bind="text: sender"></span><span data-bind="text: origin() === 'web' ? ' (web)' : ''"></span>
+                    </p>
+                    <p data-bind="text: message" class="message"></p>
+                </div>
+                <div data-bind="if: type() == 'Join'" class="join">
+                    <p><span data-bind="text: sender"></span> has just joined!</p>
+                </div>
+                <div data-bind="if: type() == 'Leave'" class="leave">
+                    <p><span data-bind="text: sender"></span> has just left!</p>
+                </div>
             </li>
         </ul>
     </div>
@@ -43,9 +51,11 @@
 <div data-bind="visible: isChatReady" class="row new-chat">
     <form data-bind="disable: isChatSending, submit: send">
         <div class="col-lg-11 col-md-11 col-sm-10 col-xs-9">
-            <input id="txtChat" data-bind="value: newMessage, valueUpdate: 'keypress'" type="text" class="form-control" style="width: 100%" />
+            <input id="txtChat" data-bind="value: newMessage, valueUpdate: 'keypress', disable: isChatSending" type="text" class="form-control" style="width: 100%" />
         </div>
-        <input data-bind="disable: !canBeSent()" type="submit" value="Send" class="btn btn-info col-lg-1 col-md-1 col-sm-2 col-xs-3" />
+        <div class="col-lg-1 col-md-1 col-sm-2 col-xs-3">
+            <input data-bind="disable: !canBeSent() || isChatSending()" type="submit" value="Send" class="btn btn-info" style="width: 100%" />
+        </div>
     </form>
 </div>
 

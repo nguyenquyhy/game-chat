@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
@@ -15,7 +16,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using GameChat.Web.Logics;
 using Microsoft.AspNet.SignalR;
-using System.Linq;
+using GameChat.Web.Attributes;
+using System.Diagnostics;
 
 namespace GameChat.Web
 {
@@ -52,7 +54,7 @@ namespace GameChat.Web
                     };
                     formatter.SerializerSettings = settings;
                 }
-            });
+            }); ;
 
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
@@ -60,8 +62,18 @@ namespace GameChat.Web
 
             services.AddSignalR();
 
-            services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
+            if (Configuration.Get("Data:Type") == "AzureStorage")
+            {
+                services.AddInstance<IStorageLogic>(new AzureTableStorageLogic(Configuration));
+                Trace.TraceInformation("Initialized AzureStorage");
+            }
+            else
+            { 
+                services.AddInstance<IStorageLogic>(new InMemoryStorageLogic());
+                Trace.TraceInformation("Initialized InMemoryStorage");
+            }
             services.AddInstance<IConfiguration>(Configuration);
+            services.AddInstance<SimpleAuthorizeAttribute>(new SimpleAuthorizeAttribute(Configuration));
         }
 
         // Configure is called after ConfigureServices is called.

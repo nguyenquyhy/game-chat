@@ -2,6 +2,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
     var AppViewModel = (function () {
         function AppViewModel() {
             var _this = this;
+            this.hasLocalStorage = ko.observable(typeof (Storage) !== "undefined");
             this.applicationPassword = ko.observable(null);
             this.sources = ko.observableArray([]);
             this.selectedSource = ko.pureComputed({
@@ -21,14 +22,26 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             this.needGameCredential = ko.observable(false);
             this.username = ko.observable(null);
             this.password = ko.observable(null);
+            this.remember = ko.observable(false);
+            this.isLoggingIn = ko.observable(false);
             this.isChatLoading = ko.observable(false);
             this.isChatReady = ko.observable(false);
             this.chatMessages = ko.observableArray([]);
+            this.unreadCount = ko.observable(0);
             this.isChatSending = ko.observable(false);
             this.newMessage = ko.observable(null);
             this.canBeSent = ko.computed(function () {
                 return _this.newMessage() !== null && _this.newMessage().trim() !== "";
             });
+            this.isBlur = ko.observable(false);
+            window.onblur = function () {
+                _this.isBlur(true);
+            };
+            window.onfocus = function () {
+                _this.isBlur(false);
+                _this.unreadCount(0);
+                document.title = 'GameChat';
+            };
         }
         AppViewModel.prototype.start = function () {
             this.isReady(false);
@@ -41,6 +54,7 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             $.ajax('api/Sources', {
                 method: 'GET',
                 dataType: 'JSON',
+                cache: false,
                 success: function (data, status, xhr) {
                     _this.sources.removeAll();
                     $.each(data, function (index, item) { return _this.sources.push(item); });
@@ -52,13 +66,21 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     _this.isLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 }
             });
         };
         AppViewModel.prototype.sourceSelected = function () {
             if (this.source !== null) {
+                if (this.source.token == null && typeof (Storage) !== "undefined" && localStorage.getItem(this.source.key + ":token") != null) {
+                    this.source.token = localStorage.getItem(this.source.key + ":token");
+                    this.source.username = localStorage.getItem(this.source.key + ":username");
+                }
                 if (this.source.token == null) {
+                    this.username(null);
+                    this.password(null);
+                    this.remember(false);
+                    this.isChatLoading(false);
                     this.needGameCredential(true);
                 }
                 else {
@@ -72,30 +94,46 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
         };
         AppViewModel.prototype.login = function () {
             var _this = this;
-            $.ajax('api/Sources/Login/' + this.source.key, {
-                method: 'POST',
+            this.isLoggingIn(true);
+            $.ajax('api/Sources/' + this.source.key, {
+                method: 'GET',
                 data: {
                     username: this.username(),
                     password: this.password()
                 },
+                cache: false,
                 success: function (data, status, xhr) {
-                    _this.source.username = _this.username();
-                    _this.source.token = data;
-                    _this.getChatMessages(_this.source.key);
-                    _this.needGameCredential(false);
+                    if (_this.source.key === data.key) {
+                        _this.isLoggingIn(false);
+                        if (data.token != null) {
+                            _this.source.username = data.username;
+                            _this.source.token = data.token;
+                            _this.getChatMessages(_this.source.key);
+                            _this.needGameCredential(false);
+                            if (_this.remember() && typeof (Storage) !== "undefined") {
+                                localStorage.setItem(data.key + ":username", data.username);
+                                localStorage.setItem(data.key + ":token", data.token);
+                            }
+                        }
+                        else {
+                            alert('Cannot Login! Please check your username and password.');
+                        }
+                    }
                 },
                 error: function (xhr, status, errorString) {
+                    _this.isLoggingIn(false);
                     alert('Cannot Login! ' + errorString);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 },
             });
         };
         AppViewModel.prototype.send = function () {
             var newChat = {
-                timestamp: new Date(),
+                timestamp: (new Date()).toISOString(),
                 sender: this.source.username,
+                type: 'Chat',
                 message: this.newMessage(),
                 origin: 'web'
             };
@@ -108,19 +146,20 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             $.ajax('api/Chat/' + sourceKey, {
                 method: 'GET',
                 dataType: 'JSON',
+                cache: false,
                 success: function (data, status, xhr) {
                     _this.chatMessages.removeAll();
                     $.each(data, function (index, item) { return _this.chatMessages.push(new chatVM.ChatMessageViewModel(item)); });
-                    _this.scrollToBottom();
                     _this.isChatReady(true);
                     _this.isChatLoading(false);
+                    _this.scrollToBottom();
                 },
                 error: function (xhr, status, errorString) {
                     alert('Cannot get chat message! ' + errorString);
                     _this.isChatLoading(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword()
+                    "Authorization": this.getAuthHeader()
                 }
             });
         };
@@ -142,9 +181,8 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
                     _this.isChatSending(false);
                 },
                 headers: {
-                    "Authorization": "Basic " + this.applicationPassword(),
-                    "X-TOKEN": this.source.token
-                },
+                    "Authorization": this.getAuthHeader()
+                }
             });
         };
         AppViewModel.prototype.addChatMessage = function (sourceKey, message) {
@@ -158,8 +196,13 @@ define(["require", "exports", 'ChatMessageViewModel'], function (require, export
             var scrollHeight = chatList.prop('scrollHeight');
             chatList.animate({ scrollTop: scrollHeight }, "fast");
         };
+        AppViewModel.prototype.getAuthHeader = function () {
+            var token = "";
+            if (this.source != null && this.source.token != null)
+                token = this.source.token;
+            return "Basic " + window.btoa(this.applicationPassword() + ':' + token);
+        };
         return AppViewModel;
     })();
     exports.AppViewModel = AppViewModel;
 });
-//# sourceMappingURL=AppViewModel.js.map
